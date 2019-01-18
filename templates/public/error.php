@@ -1,6 +1,6 @@
   <div id="topRow">
     <div class="col">
-      <div class="instructionsSmooth"><span class="header"><?php _e( 'Step 5.', 'book-a-room' ); ?></span>
+      <div class="instructionsSmooth"><span class="header"><?php _e( 'Step 5..', 'book-a-room' ); ?></span>
         <p><em><?php _e( 'Complete the registration form.', 'book-a-room' ); ?></em></p>
         <p><em><strong><?php _e( 'Items marked with an asterisk* are required fields.', 'book-a-room' ); ?></strong></em></p>
        <div id="errorArea">

@@ -414,7 +414,7 @@ class book_a_room_meetings
 
 		return $final;
 	}
-	
+	/* 
 	public static function getPending( $date = NULL, $statusArr = array(), $isEvent = NULL, $showHidden = false, $approvedOnly = false, $viewAll = false )
 	{
 		global $wpdb;
@@ -531,7 +531,7 @@ class book_a_room_meetings
 		}
 	
 		return $final;
-	}
+	} */
 	
 	public static function getDaily( $date )
 	{
