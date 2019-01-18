@@ -185,33 +185,21 @@ class bookaroom_public
 		# pull in and apply to final
 		if( $getTemp = filter_input_array( INPUT_GET, $getArr ) )
 			$final = $getTemp;
+/**
+ * Changed By David
+ */
 		# setup POST variables
 		$postArr = array(	'action'					=> FILTER_SANITIZE_STRING, 
-							'amenity' 					=> array(	'filter' => FILTER_SANITIZE_STRING,
-																	'flags'  => FILTER_FORCE_ARRAY ),
-							'contactAddress1'			=> FILTER_SANITIZE_STRING, 
-							'contactAddress2'			=> FILTER_SANITIZE_STRING, 
-							'contactCity'				=> FILTER_SANITIZE_STRING, 
-							'contactCityDrop'			=> FILTER_SANITIZE_STRING, 
 							'contactEmail'				=> FILTER_SANITIZE_STRING, 
 							'contactName'				=> FILTER_SANITIZE_STRING, 
-							'contactPhonePrimary'		=> FILTER_SANITIZE_STRING, 
-							'contactPhoneSecondary'		=> FILTER_SANITIZE_STRING, 
-							'contactState'				=> FILTER_SANITIZE_STRING, 
-							'contactWebsite'			=> FILTER_SANITIZE_STRING, 
-							'contactZip'				=> FILTER_SANITIZE_STRING, 
 							'desc'						=> FILTER_SANITIZE_STRING, 
 							'endTime'					=> FILTER_SANITIZE_STRING, 
 							'eventName'					=> FILTER_SANITIZE_STRING, 
 							'hours' 					=> array(	'filter' => FILTER_SANITIZE_STRING,
 																	'flags'  => FILTER_FORCE_ARRAY ),
-							'libcardNum'				=> FILTER_SANITIZE_STRING, 
-							'nonProfit'					=> FILTER_SANITIZE_STRING, 
-							'notes'						=> FILTER_SANITIZE_STRING, 
 							'numAttend'					=> FILTER_SANITIZE_STRING, 
 							'roomID'					=> FILTER_SANITIZE_STRING, 
 							'session'					=> FILTER_SANITIZE_STRING, 
-							'isSocial'					=> FILTER_SANITIZE_STRING, 
 							'startTime'					=> FILTER_SANITIZE_STRING, 
 							'timestamp'					=> FILTER_SANITIZE_STRING );
 	
@@ -235,6 +223,7 @@ class bookaroom_public
 		return $final;
 	}
 	
+	/* Changed By David
 	public static function getClosings( $roomID, $timestamp, $roomContList )
 	{
 		global $wpdb;
@@ -276,7 +265,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		}
 		
 		return false;
-	}
+	} */
 	
 	
 	public static function getReservations( $roomID, $timestamp, $timeEnd = NULL, $res_id = NULL )
@@ -292,8 +281,6 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 			$endTime		= date( 'Y-m-d H:i:s', mktime( 0, 0, 0, $timeInfo['mon'], $timeInfo['mday']+1, $timeInfo['year'] ) - 1 );
 		} else {
 			$increment	= get_option( 'bookaroom_baseIncrement' );
-			$setupInc	= get_option( 'bookaroom_setupIncrement' );			
-			$cleanupInc	= get_option( 'bookaroom_cleanupIncrement' );
 			$startTime		= date( 'Y-m-d H:i:s', $timestamp + ($increment * 60 * $setupInc) );
 			$endTime		= date( 'Y-m-d H:i:s', $timeEnd + ($increment * 60 * $cleanupInc) );
 		}
@@ -304,21 +291,25 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 			$where = NULL;
 		}
 			
-		$sql = "SELECT `res`.*, `ti`.* FROM `{$wpdb->prefix}bookaroom_times` as `ti` 
+		/***
+		 * Rewrite By David 
+		 * 	Sumaita
+		 * 	Removed part of the where clause
+		 */
+		$sql = "SELECT `res`.*, `ti`.*, 'compName' FROM `{$wpdb->prefix}bookaroom_times` as `ti` 
 				LEFT JOIN `{$wpdb->prefix}bookaroom_reservations` as `res` ON `ti`.`ti_extID` = `res`.`res_id` 
 				WHERE ( `ti`.`ti_startTime`< '{$endTime}' AND `ti`.`ti_endTime` > '{$startTime}' )
 				AND `ti`.`ti_roomID` IN (
 					SELECT DISTINCT `roomMembers`.`rcm_roomContID` 
 					FROM `{$wpdb->prefix}bookaroom_roomConts_members` as `roomMembers` 
-					WHERE 	( ( `ti`.`ti_type` = 'meeting' AND ( `res`.me_status != 'archived' and `res`.`me_status` != 'denied')  ) OR 
-							( `ti`.`ti_type` = 'event') )	AND 
+					WHERE 
 					`rcm_roomID` IN ( 
 						SELECT `roomMembers`.`rcm_roomID` FROM 					
 						`{$wpdb->prefix}bookaroom_roomConts_members` as `roomMembers` 
 						WHERE rcm_roomContID = '{$roomID}'{$where} ) );";
 		$final = $wpdb->get_results( $sql, ARRAY_A );
-		
-		
+		/* 
+		Removed so that site will show the name of person using the plugin
 		if( get_option('bookaroom_obfuscatePublicNames') == true ) {
 			foreach( $final as $key => &$val ) {
 				if( $val['ti_type'] !== 'event' ) {
@@ -326,12 +317,14 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 				}
 			}
 		}
+		 */
 		return $final;
 	}
 	
 	protected static function getSession( &$externals )
 	{
-		$valArr = array( 'action', 'amenity', 'contactAddress1', 'contactAddress2', 'contactCity', 'contactEmail', 'contactName', 'contactPhonePrimary', 'contactPhoneSecondary', 'contactState', 'contactWebsite', 'contactZip', 'desc', 'notes', 'eventName', 'nonProfit', 'numAttend', 'roomID' );
+		// Removed options to refelect new data
+		$valArr = array( 'action','contactEmail', 'contactName','desc', 'notes', 'eventName','numAttend', 'roomID' );
 		
 		foreach( $valArr as $key ) {
 			if(!empty( $_SESSION['savedMeetingFormVals'][$key] ) ) {
@@ -377,19 +370,6 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 	public static function showForm_checkErrors( &$externals, $branchList, $roomContList, $roomList, $amenityList, $cityList )
 	{
 		$final = array();
-		# library card
-		# is social true
-		$libcardRegex = get_option( 'bookaroom_libcardRegex' );
-		
-		if( $externals['isSocial'] ) {
-			if( empty( $externals['libcardNum'] ) ) {
-				$final['classes']['libcardNum'] = 'error';
-				$final['errorMSG'][] = __( 'You must enter your <em>Library Card Number</em>.', 'book-a-room' );
-			} elseif( !empty( $libcardRegex ) and FALSE == preg_match( $libcardRegex, $externals['libcardNum'] ) ) {
-				$final['classes']['libcardNum'] = 'error';
-				$final['errorMSG'][] = __( 'You must enter a valid <em>Library Card Number</em>.', 'book-a-room' );
-			}
-		}
 		
 		# event name
 		if( empty( $externals['eventName'] ) ) {
@@ -427,90 +407,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 			$final['classes']['contactName'] = 'error';
 			$final['errorMSG'][] = __( 'You must enter a value in the <em>Contact name</em> field.', 'book-a-room' ); 
 		}
-		# clean phone
-		#$cleanPhone = preg_replace( "/[^0-9]/", '', $externals['contactPhonePrimary'] );
-		#if ( strlen( $cleanPhone ) == 11 ) $cleanPhone = preg_replace( "/^1/", '', $cleanPhone );
-		# contact primary phone
-		# ignore if regex is empty
-		$phoneRegex = get_option( 'bookaroom_phone_regex' );
-		$phoneExample = get_option( 'bookaroom_phone_example' );
-	    
-		$cleanPhone = str_replace( array( '(', ')', ' ' ), '', $externals['contactPhonePrimary'] );
-		if( empty( $cleanPhone ) ) {
-			$final['classes']['contactPhonePrimary'] = 'error';
-			$final['errorMSG'][] = __( 'You must enter a value in the <em>Primary phone</em> field.', 'book-a-room' );
-		} elseif( !empty( $phoneRegex ) ) {
-		# check main phone against regex
-			if( !preg_match( $phoneRegex, $cleanPhone ) ) {
-				$final['classes']['contactPhonePrimary'] = 'error';
-				$final['errorMSG'][] = sprintf( __( 'You must enter a valid phone number in the <em>Primary phone</em> field. Example: %s', 'book-a-room' ), $phoneExample );
-			}
-		}
 			
-		$cleanPhone = str_replace( array( '(', ')', ' ' ), '', $externals['contactPhoneSecondary'] );
-		if( !empty( $cleanPhone ) and !empty( $phoneRegex ) ) {
-		# check main phone against regex
-			if( !preg_match( $phoneRegex, $cleanPhone ) ) {
-				$final['classes']['contactPhoneSecondary'] = 'error';
-				$final['errorMSG'][] = sprintf( __( 'You must enter a valid phone number in the <em>Secondary phone</em> field. Example: %s', 'book-a-room' ), $phoneExample );
-			}
-		}		
-		
-		# street address
-		if( empty( $externals['contactAddress1'] ) ) {
-			$final['classes']['contactAddress1'] = 'error';
-			$final['errorMSG'][] = __( 'You must enter a value in the <em>Street Address</em> field.', 'book-a-room' );
-		}
-		# city
-		#
-		# first, is social selected
-		if( empty( $externals['isSocial'] ) ) {
-			if( empty( $externals['contactCity'] ) ) {
-				$final['classes']['contactCity'] = 'error';
-				$final['errorMSG'][] = __( 'You must enter a value in the <em>City</em> field.', 'book-a-room' );
-			}
-		} else {
-			if( empty( $externals['contactCityDrop'] )) {
-				$final['classes']['contactCity'] = 'error';
-				$final['errorMSG'][] = __( 'You must choose a <em>City</em> from the drop down.', 'book-a-room' );
-			} elseif( $externals['contactCityDrop'] == 'other' ) {
-				$final['classes']['contactCity'] = 'error';
-				$final['errorMSG'][] = __( 'To use our meetings rooms for social events, you have to live in one of the cities listed in the <em>City</em> drop down. Please refer to our guidelines for more information.', 'book-a-room' );
-			} elseif( !array_key_exists( $externals['contactCityDrop'], $cityList ) ) {
-				$final['classes']['contactCity'] = 'error';
-				$final['errorMSG'][] = __( 'You must choose a valid <em>City</em> from the drop down.', 'book-a-room' );
-			}
-		}
-		
-		# state
-		if( get_option( 'bookaroom_addressType' ) ==  'usa' ) {
-			if( empty( $externals['contactState'] ) ) {
-				$final['classes']['contactState'] = 'error';
-				$final['errorMSG'][] = __( 'You must choose an item from the <em>State</em> drop-down.', 'book-a-room' );
-			} elseif( !array_key_exists( $externals['contactState'], self::getStates() ) ) {
-				$final['classes']['contactState'] = 'error';
-				$final['errorMSG'][] = __( 'That state is invalid. Please choose a valid item from the <em>State</em> drop-down.', 'book-a-room' );
-			}
-		} elseif( empty( $externals['contactState'] ) ) {
-				$final['classes']['contactState'] = 'error';
-				$stateName = get_option( 'bookaroom_state_name' );
-				$final['errorMSG'][] = sprintf( __( 'You must enter a value in the <em>%s</em> drop-down.', 'book-a-room' ), $stateName );
-		}
-		
-		# zip code
-		$zipRegex = get_option( 'bookaroom_zip_regex' );
-		$zipExample = get_option( 'bookaroom_zip_example' );
-		
-		if( empty( $externals['contactZip'] ) ) {
-			$final['classes']['contactZip'] = 'error';
-			$final['errorMSG'][] = __( 'You must enter a value in the <em>Zip code</em> field.', 'book-a-room' ); 
-		} elseif( !empty( $zipRegex ) ) {
-			if( !preg_match( $zipRegex, $externals['contactZip'] ) ) {
-				$final['classes']['contactZip'] = 'error';
-				$final['errorMSG'][] = sprintf( __( 'You must enter a valid postal code. Example: %s', 'book-a-room' ), $zipExample );
-			}
-		}
-		
 		# email address
 		if( empty( $externals['contactEmail'] ) ) {
 			$final['classes']['contactEmail'] = 'error';
@@ -528,9 +425,9 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 	
 	protected static function showForm_hoursError( $errorMSG, $externals )
 	{
-		# save values into session data
-		$valArr = array( 'action', 'amenity', 'contactAddress1', 'contactAddress2', 'contactCity', 'contactEmail', 'contactName', 'contactPhonePrimary', 'contactPhoneSecondary', 'contactState', 'contactWebsite', 'contactZip', 'desc', 'notes', 'eventName', 'nonProfit', 'numAttend', 'roomID' );
-		
+		// Removed options to refelect new data
+		$valArr = array( 'action','contactEmail', 'contactName','desc', 'notes', 'eventName','numAttend', 'roomID' );
+
 		foreach( $valArr as $key ) {
 			$_SESSION['savedMeetingFormVals'][$key] = $externals[$key];
 		}
@@ -549,31 +446,11 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 	{
 		global $wpdb;
         
-        $currentTimeMySQL = date_i18n( 'Y-m-d H:i:s', current_time( 'timestamp' ) );
-		
-		$social = ( !empty( $externals['isSocial'] ) ) ? true : false;
-		if( $social == true ) {
-			$cityName = $cityList[$externals['contactCityDrop']];
-		} else {
-			$cityName = esc_textarea( $externals['contactCity'] );
-		}
-		# nonprofit
-		$nonProfit = ( empty(  $externals['nonProfit'] ) ) ? 0 : 1;
-		
-		if( empty( $externals['amenity'] ) ) {
-			$amenity = "";
-		} else {
-			$amenity = serialize( $externals['amenity'] );
-		}
-		
-		if( !empty( $event ) ) {
-			$event = TRUE;
-			$pending = 'approved';
-		} else {
-			$event = TRUE;
-			$pending = 'approved';
-		}
-		
+		$currentTimeMySQL = date_i18n( 'Y-m-d H:i:s', current_time( 'timestamp' ) );
+/**
+ * Changed By David
+ * 	Sumaita make changes based on the db tables created 
+ */
 		$table_name = $wpdb->prefix . "bookaroom_reservations";
 		$final = $wpdb->insert( $table_name, array( 
             'res_created'               => $currentTimeMySQL,
@@ -609,41 +486,15 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 	
 	public static function showForm_publicRequest( $roomContID, $branchList, $roomContList, $roomList, $amenityList, $cityList, $externals, $errorArr = NULL, $edit = NULL )
 	{
-		if( get_option( 'bookaroom_addressType' ) !== 'usa' ) {
-			$address1_name 	= get_option( 'bookaroom_address1_name');
-			$address2_name 	= get_option( 'bookaroom_address2_name');
-			$city_name 		= get_option( 'bookaroom_city_name');
-			$state_name 	= get_option( 'bookaroom_state_name');
-			$zip_name 		= get_option( 'bookaroom_zip_name');
-		} else {
-			$address1_name 	= 'Street Address';
-			$address2_name 	= 'Address';
-			$city_name 		= 'City';			
-			$state_name 	= 'State';
-			$zip_name 		= 'Zip Code';
-		}		
 		
-		$NPyesChecked = $NPnoChecked = NULL;
-				
-		if( !empty( $externals['nonProfit'] ) ) {
-			$NPyesChecked = ' checked="checked"';
-		} else {
-			$NPnoChecked = ' checked="checked"';
-		}
-		
-		$SOyesChecked = $SOnoChecked = null;
-			
-		if(  true == ( $externals['isSocial'] ) ) {
-			$SOyesChecked = ' checked="checked"';
-		} else {
-			$SOnoChecked = ' checked="checked"';	
-		}
 		
         ob_start();
         
 		if( !empty( $edit ) ) {
+			// Need to edit based on existing forms and data
 			require( BOOKAROOM_PATH . 'templates/meetings/pending_edit.php' );
 		} else {
+			// Need to edit based on existing forms and data
 			require( BOOKAROOM_PATH . 'templates/public/publicRequest.php' );
 		}
         
@@ -655,7 +506,10 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 	
 	protected static function showRooms( $branchList, $roomContList, $roomList, $amenityList )
 	{
-        ob_start();        
+		ob_start();        
+		// Initial page that will show a list of rooms available to book
+		// Need to change some of the info on this file
+		// e.g. remove amenities and things like that
 		require( BOOKAROOM_PATH . 'templates/public/publicShowRooms.php' );
         $final = ob_get_contents();
         ob_end_clean();
@@ -693,7 +547,8 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 			$branchID = NULL;
 			$roomID = NULL;
 		}
-        ob_start();
+		ob_start();
+		// Need to edit based on existing forms and data
 		require( BOOKAROOM_PATH . 'templates/public/publicShowRooms_day.php' );
 		$final = ob_get_contents();
         ob_end_clean();
@@ -701,6 +556,16 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return $final;  
 	}
 	
+	/**
+	 * Removed By David 
+	 *
+	 * @param [type] $externals
+	 * @param [type] $amenityList
+	 * @param [type] $roomContList
+	 * @param [type] $branchList
+	 * @param boolean $admin
+	 * @return void
+	 *
 	public static function sendAlertEmail( $externals, $amenityList, $roomContList, $branchList, $admin = false )
 	{
 		$filename = BOOKAROOM_PATH . 'templates/public/adminNewRequestAlert.html';	
@@ -710,30 +575,9 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		
 		$contents = str_replace( '#pluginLocation#', plugins_url( '', __FILE__ ), $contents );		
 		
-		# Amenities
-		if( empty( $externals['amenity'] ) ) {
-			$externals['amenityVal'] = __( 'No amenities', 'book-a-room' );
-		} else {
-			$amentiyArr = array();
-			foreach( $externals['amenity'] as $key => $val ) {
-				$amenityArr[] = $amenityList[$val];
-			}
-			$externals['amenityVal'] = implode( ', ', $amenityArr );
-		}
-		if( $externals['nonProfit'] == TRUE ) {
-			$externals['nonProfitDisp'] = 'Yes';
-			$externals['roomDeposit'] = get_option( 'bookaroom_nonProfitDeposit' );
-			$costIncrement =  get_option( 'bookaroom_nonProfitIncrementPrice' );
-		} else {
-			$externals['nonProfitDisp'] = 'No';
-			$externals['roomDeposit'] = get_option( 'bookaroom_profitDeposit' );
-			$costIncrement =  get_option( 'bookaroom_profitIncrementPrice' );
-		}
+		
 		
 		$roomCount = 1;
-		
-		$externals['roomCost'] = ( ( ( ( $externals['endTime'] - $externals['startTime'] ) / 60 ) / get_option( 'bookaroom_baseIncrement' ) ) * $costIncrement ) * $roomCount;
-		$externals['roomTotal'] = $externals['roomCost'] + $externals['roomDeposit'];
 		
 		# times
 		$externals['formDate'] = date_i18n( 'l, F jS, Y', $externals['startTime'] );
@@ -746,11 +590,9 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		$externals['roomName'] = $roomContList['id'][$externals['roomID']]['desc'];
 		$externals['branchName'] = $branchList[$roomContList['id'][$externals['roomID']]['branchID']]['branchDesc'];
 		
-		# payment link
-		$externals['paymentLink'] = 'test.php';
-		
+		#		
 		# array of all values
-		$valArr = array( 'amenityVal','branchName','branchNames','contactAddress1','contactAddress2','contactCity','contactEmail','contactName','contactPhonePrimary','contactPhoneSecondary','contactState','contactWebsite','contactZip','desc','endTimeDisp','eventName','formDate','nonProfitDisp','numAttend', 'paymentLink', 'roomCost','roomDeposit','roomID','roomName','roomTotal','startTimeDisp' );
+		$valArr = array('branchName','branchNames','contactEmail','contactName','desc','endTimeDisp','eventName','formDate','numAttend','roomID','roomName','roomTotal','startTimeDisp' );
 		
 		foreach( $valArr as $key => $val ) {
 			$contents = @str_replace( "#{$val}#", $externals[$val], $contents );
@@ -767,7 +609,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n" .
 					$replyToOnly .
 				    'X-Mailer: PHP/' . phpversion();
-		/* translators: Book a Room Event Created: BRANCH_NAME [ROOM_NAME] by CONTACT_NAME on START_DATE from START_TIME to END_TIME */
+		/* translators: Book a Room Event Created: BRANCH_NAME [ROOM_NAME] by CONTACT_NAME on START_DATE from START_TIME to END_TIME 
 		$subject = sprintf( __( 'Book a Room Event Created: %s [%s] by %s on %s from %s to %s', 'book-a-room' ), $externals['branchName'], $externals['roomName'], $externals['contactName'], $externals['formDate'], $externals['startTimeDisp'], $externals['endTimeDisp'] );
 		
 		mail( $email, $subject, $contents, $headers );
@@ -777,6 +619,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 			mail( $contactEmail, $subject, $contents, $headers );
 		}
 	}
+	*/
 	
 	public static function sendCustomerReceiptEmail( $externals, $amenityList, $roomContList, $branchList, $internal = false )
 	{
@@ -796,29 +639,11 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		$subject	= self::replaceItems( $subject, $externals, $amenityList, $roomContList, $branchList );
 		$contents	= self::replaceItems( $contents, $externals, $amenityList, $roomContList, $branchList );
 		
-		$option['bookaroom_profitDeposit']				= get_option( 'bookaroom_profitDeposit' );
-		$option['bookaroom_nonProfitDeposit']			= get_option( 'bookaroom_nonProfitDeposit' );
-		$option['bookaroom_profitIncrementPrice']		= get_option( 'bookaroom_profitIncrementPrice' );
-		$option['bookaroom_nonProfitIncrementPrice']	= get_option( 'bookaroom_nonProfitIncrementPrice' );
+		
 		$option['bookaroom_baseIncrement']				= get_option( 'bookaroom_baseIncrement' );
 				
 		$roomCount = count( $roomContList['id'][$externals['roomID']]['rooms'] );
-				
-		if( empty( $externals['nonProfit'] ) ) {
-			# find how many increments
-			$minutes = ( ( $externals['endTime'] - $externals['startTime'] ) / 60 ) / $option['bookaroom_baseIncrement'] ;
-			$roomPrice = $minutes * $option['bookaroom_profitIncrementPrice'] * $roomCount;
-			$deposit = 	intval( $option['bookaroom_profitDeposit'] );
-		} else {
-			# find how many increments
-			$minutes = ( ( $externals['endTime'] - $externals['startTime'] ) / 60 ) / $option['bookaroom_baseIncrement'] ;
-			$roomPrice = $minutes * $option['bookaroom_nonProfitIncrementPrice'] * $roomCount;
-			$deposit = 	intval( $option['bookaroom_nonProfitDeposit'] );	
-		}
-		
-		$contents = str_replace( '{deposit}', $deposit, $contents );
-		$contents = str_replace( '{roomPrice}', $roomPrice, $contents );
-		$contents = str_replace( '{totalPrice}', $roomPrice+$deposit, $contents );
+		// Removed pricing info
 		
 		# create email
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -834,23 +659,6 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 	public static function replaceItems( $contents, $externals, $amenityList, $roomContList, $branchList )
 	{
 		$oldExternals = $externals;
-		
-		# Amenities
-		if( empty( $externals['amenity'] ) ) {
-			$externals['amenity'] = __( 'No amenities', 'book-a-room' );
-		} else {
-			$amentiyArr = array();
-			foreach( $externals['amenity'] as $key => $val ) {
-				$amenityArr[] = $amenityList[$val];
-			}
-			$externals['amenity'] = implode( ', ', $amenityArr );
-		}
-		
-		if( $externals['nonProfit'] == TRUE ) {
-			$externals['nonProfit'] = 'Yes';
-		} else {
-			$externals['nonProfit'] = 'No';
-		}
 
 		# date 1 - two weeks from now
 		$timeArr = getdate( time() );
@@ -868,10 +676,6 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		if( $mainDate < $date3 ) {
 			$mainDate = $date3;
 		}
-
-		$externals['paymentDate'] = date_i18n( 'l, F jS, Y', $mainDate );
-		
-		$externals['paymentLink'] = 'test.php';
 				
 
 		# times
@@ -884,21 +688,9 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		
 		$externals['roomName'] = $roomContList['id'][$externals['roomID']]['desc'];
 		$externals['branchName'] = $branchList[$roomContList['id'][$externals['roomID']]['branchID']]['branchDesc'];
-
-		# costs
-		if( empty( $oldExternals['nonProfit'] ) ) {
-			$externals['roomDeposit'] = get_option( 'bookaroom_profitDeposit' );
-			$costIncrement =  get_option( 'bookaroom_profitIncrementPrice' );
-		} else {
-			$externals['roomDeposit'] = get_option( 'bookaroom_nonProfitDeposit' );
-			$costIncrement =  get_option( 'bookaroom_nonProfitIncrementPrice' );
-		}
-		
-		$externals['roomCost'] = ( ( ( ( $oldExternals['endTime'] - $oldExternals['startTime'] ) / 60 ) / get_option( 'bookaroom_baseIncrement' ) ) * $costIncrement );
-		$externals['roomTotal'] = $externals['roomCost'] + $externals['roomDeposit'];
 		
 		# final			
-		$goodArr = array( 'amenity','branchName','contactAddress1','contactAddress2','contactCity','contactEmail','contactName','contactPhonePrimary','contactPhoneSecondary','contactState','contactWebsite','contactZip','date','desc','endTime','eventName','nonProfit','numAttend','paymentDate','paymentLink','roomCost','roomDeposit','roomName','roomTotal','startTime','resID');
+		$goodArr = array('branchName','contactEmail','contactName','date','desc','endTime','eventName','numAttend','roomName','startTime','resID');
 		
 		#
 		foreach( $goodArr as $val ) {
