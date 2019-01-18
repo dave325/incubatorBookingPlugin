@@ -28,21 +28,15 @@ class bookaroom_public
 		$externals = self::getExternalsPublic();
 		
 		# includes
-		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-amenities.php' );
 		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-rooms.php' );
 		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-branches.php' );
 		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-roomConts.php' );
 		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-closings.php' );
-		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-cityManagement.php' );
 		
 		# vaiables from includes
 		$roomContList = bookaroom_settings_roomConts::getRoomContList( true );
 		$roomList = bookaroom_settings_rooms::getRoomList();
 		$branchList = bookaroom_settings_branches::getBranchList( TRUE, TRUE );
-		$amenityList = bookaroom_settings_amenities::getAmenityList();
-		$realAmenityList = bookaroom_settings_amenities::getAmenityList( true );
-		$cityList = bookaroom_settings_cityManagement::getCityList( );
-		$stateList = self::getStates();
 		
 		# check action
 		switch( $externals['action'] ) {
@@ -70,14 +64,6 @@ class bookaroom_public
 				$externals['endTime'] = end( $hoursList ) + ( $baseIncrement * 60 );
 				
 				# check for SESSION variables
-							
-				if( 'usa' ==  get_option( 'bookaroom_addressType' ) ) {
-					$externals['contactState'] = array_search( get_option( 'bookaroom_defaultState_name' ), $stateList );
-				} else {
-					$externals['contactState'] = get_option( 'bookaroom_defaultState_name' );	
-				}
-
-				$externals['nonProfit'] = FALSE;
 				
 				if( !empty( $_SESSION['savedMeetingFormVals']['sessionGo'] ) ) {
 					self::getSession( $externals );

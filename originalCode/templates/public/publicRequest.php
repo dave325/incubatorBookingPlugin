@@ -60,7 +60,7 @@
                                 </strong>
                             </div>
                         </div>
-                        <div class="wideCol">
+                       <!--  <div class="wideCol">
                             <div class="question"><?php _e( 'Non Profit 501(c)(3)', 'book-a-room' ); ?> *</div>
                             <div class="formInput">
                                 <div style="float: left; margin-right: 30px;">
@@ -71,7 +71,7 @@
 									<?php _e( 'No', 'book-a-room' ); ?>
 								</div>
                             </div>
-                        </div>
+                        </div> -->
                         <!--  
 					<div class="wideCol" id="fileUpload">
 						<div class="question">< ?php #_e( '501(c)(3) paperwork', 'book-a-room' ); ? > *</div>
@@ -81,7 +81,7 @@
 					</div>
 					Start file upload -->
                         <!--  Start social code -->
-                        <?php
+                        <!-- <?php
                         if ( $branchList[ $roomContList[ 'id' ][ $roomContID ][ 'branchID' ] ][ 'branch_isSocial' ] ) {
                             ?>
                         <div class="wideCol" id="socialEvent">
@@ -104,7 +104,7 @@
 								</div>
                             </div>
                         </div>
-                        <!--   Library Card -->
+                        <!--   Library Card --
                         <div class="wideCol" id="libraryCard">
                             <div class="question">
                                 <?php _e( 'Library Card Number?', 'book-a-room' ); ?> *</div>
@@ -114,7 +114,7 @@
                         </div>
                         <?php
                         }
-                        ?>
+                        ?> -->
                         <div class="wideCol">
                             <div class="question">
                                 <label for="eventName">
@@ -151,7 +151,7 @@
                                 <input<?php if( !empty( $errorArr[ 'classes'][ 'contactName'] ) ) echo ' class="error"'; ?> name="contactName" type="text" id="contactName" value="<?php echo $externals['contactName']; ?>" size="32" maxlength="64"/>
                             </div>
                         </div>
-                        <div class="wideCol">
+                       <!--  <div class="wideCol">
                             <div class="question">
                                 <label for="contactPhonePrimary">
                                     <?php _e( 'Primary phone', 'book-a-room' ); ?> *</label>
@@ -189,7 +189,7 @@
                                 <input name="contactAddress2" type="text" id="contactAddress2" value="<?php echo $externals['contactAddress2']; ?>" size="64" maxlength="255"/>
                             </div>
                         </div>
-                        <!-- city information including drop down for social events -->
+                        <!-- city information including drop down for social events --
                         <div class="wideCol" id="cityFill">
                             <div class="question">
                                 <label for="contactCity">
@@ -339,7 +339,7 @@
                                 }
                                 ?>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="wideCol">
                             <div class="question">&nbsp;&nbsp;</div>
                             <div class="formInput">
@@ -358,7 +358,7 @@
 </div>
 <script>
     /* check if nonprofit is selected */
-    jQuery( "#nonProfitYes" ).click( function () {
+    /* jQuery( "#nonProfitYes" ).click( function () {
         jQuery( "#socialEvent" ).hide();
         jQuery( "#libraryCard" ).hide();
         jQuery( "#cityDrop" ).hide();
@@ -386,9 +386,9 @@
         jQuery( "#cityFill" ).show();
         jQuery( "#libraryCard" ).hide();
         refreshColors();
-    } );
+    } ); */
     jQuery( document ).ready( function () {
-        if ( jQuery( "input[name=nonProfit]:checked" ).val() == "" ) {
+       /*  if ( jQuery( "input[name=nonProfit]:checked" ).val() == "" ) {
             jQuery( "#socialEvent" ).show();
             jQuery( "#fileUpload" ).hide();
         } else {
@@ -419,7 +419,7 @@
         }
         <?php
 		}
-		?>
+		?> */
         refreshColors();
 
     } );
