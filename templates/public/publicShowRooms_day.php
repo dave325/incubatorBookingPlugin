@@ -519,8 +519,17 @@
                 for ( $i = 0; $i < $increments; $i++ ) {
                     #if( $count++ > 50) wp_die( 'loop' );
                     # find increment offset  from start
+                    
                     $curStart = $openTime + ( $baseIncrement * 60 * $i );
+                    echo 'This is curStart: ' .  $curStart; 
                     $curEnd = $openTime + ( $baseIncrement * 60 * ( $i + 1 ) );
+                    #find the time difference 
+                    $diff = abs(strtotime($curStart) - strtotime($timeInfo));
+                    $tmins = $diff/60;
+                    $mins = $tmins%60; 
+                    if( $mins < 30 ){
+                        echo 'Error - cannot book room 30 minutes beforehand';
+                    }
                     if ( $curEnd > $closeTime ) {
                         $curEnd = $closeTime;
                     }

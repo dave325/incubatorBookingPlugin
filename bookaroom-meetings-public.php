@@ -37,7 +37,7 @@ class bookaroom_public
 		$roomContList = bookaroom_settings_roomConts::getRoomContList( true );
 		$roomList = bookaroom_settings_rooms::getRoomList();
 		$branchList = bookaroom_settings_branches::getBranchList( TRUE, TRUE );
-		$amenityList = NULL;
+		
 		# check action
 		switch( $externals['action'] ) {
 			case 'checkForm':
