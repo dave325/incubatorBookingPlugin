@@ -209,7 +209,7 @@ class bookaroom_public
 		return $final;
 	}
 	
-	/* Changed By David
+	
 	public static function getClosings( $roomID, $timestamp, $roomContList )
 	{
 		global $wpdb;
@@ -251,7 +251,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		}
 		
 		return false;
-	} */
+	} 
 	
 	
 	public static function getReservations( $roomID, $timestamp, $timeEnd = NULL, $res_id = NULL )
