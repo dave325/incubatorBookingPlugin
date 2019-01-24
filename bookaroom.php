@@ -697,7 +697,6 @@ class bookaroom_settings
 		
 		# Room management pages
 
-		$pendingList = book_a_room_meetings::getPending();
 		$pendingCount = !empty( $pendingList['status']['pending'] ) ? count( $pendingList['status']['pending'] ) : 0;
 		$pendingPayCount = !empty( $pendingList['status']['pendPayment'] ) ? count( $pendingList['status']['pendPayment'] ) : 0;
 		$pending501C3Count = !empty( $pendingList['status']['501C3'] ) ? count( $pendingList['status']['501C3'] ) : 0;
