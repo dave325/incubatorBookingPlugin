@@ -521,18 +521,18 @@
                     # find increment offset  from start
                     
                     $curStart = $openTime + ( $baseIncrement * 60 * $i );
-                    echo 'This is curStart: ' .  $curStart; 
                     $curEnd = $openTime + ( $baseIncrement * 60 * ( $i + 1 ) );
-                    #find the time difference 
-                    $diff = abs(strtotime($curStart) - strtotime($timeInfo));
-                    $tmins = $diff/60;
-                    $mins = $tmins%60; 
-                    if( $mins < 30 ){
-                        echo 'Error - cannot book room 30 minutes beforehand';
-                    }
-                    if ( $curEnd > $closeTime ) {
-                        $curEnd = $closeTime;
-                    }
+
+                    #convert the curStart and current time to minutes
+                    $curStartHour = date('h', $curStart) * 60;
+                    $curTimeHour = date('h', current_time('timestamp')) * 60;
+
+                    $curStartMin = date('i', $curStart) + $curStartHour;
+                    $curTimeMin = date('i', current_time('timestamp')) + $curTimeHour; 
+
+                    #subtract current time from curStart. go to line 544 
+                    $reservation_constraint = abs($curStartMin - $curTimeMin); 
+
                     # last line?
                     if ( $i + $cleanupIncrements >= $increments ) {
                         $incrementList[ $i ][ 'type' ] = 'last';
@@ -540,7 +540,11 @@
                         if ( empty( $reservations ) ) {
                             if ( $curStart < current_time( 'timestamp' ) ) {
                                 $incrementList[ $i ][ 'type' ] = 'unavailable';
-                            } else {
+                            }
+                            else if( $reservation_constraint < 30){
+                                $incrementList[ $i ][ 'type' ] = 'unavailable';
+                           }
+                             else {
                                 $incrementList[ $i ][ 'type' ] = 'regular';
                             }
                         } else {
