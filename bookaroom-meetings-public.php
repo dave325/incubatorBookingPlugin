@@ -37,7 +37,11 @@ class bookaroom_public
 		$roomContList = bookaroom_settings_roomConts::getRoomContList( true );
 		$roomList = bookaroom_settings_rooms::getRoomList();
 		$branchList = bookaroom_settings_branches::getBranchList( TRUE, TRUE );
-		
+		$amenityList = NULL;
+		$realAmenityList = NULL;
+		$cityList = NULL;
+		$stateList = NULL;
+
 		# check action
 		switch( $externals['action'] ) {
 			case 'checkForm':
@@ -209,7 +213,7 @@ class bookaroom_public
 		return $final;
 	}
 	
-	/* Changed By David
+	// Changed By David
 	public static function getClosings( $roomID, $timestamp, $roomContList )
 	{
 		global $wpdb;
@@ -251,7 +255,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 		}
 		
 		return false;
-	} */
+	} 
 	
 	
 	public static function getReservations( $roomID, $timestamp, $timeEnd = NULL, $res_id = NULL )
