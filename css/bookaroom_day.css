@@ -409,6 +409,10 @@
 	font-size: 1.3em;
 	font-weight: bold;
 }
+
+#bookaroom_main_container{
+	max-width:1000px;
+}
 #topRow .instructions
 {
 	background: #EEE;
@@ -420,7 +424,6 @@
 
 	border-top-left-radius: 20px;
 	border-top-right-radius: 20px;
-	height: 180px;
 }
 #topRow .instructions, #topRow .options
 {
@@ -461,6 +464,9 @@
 #topSubmit
 {
 	display: block;
+	position:fixed;
+	left:85%;
+	top:45%;
 }
 .calNav
 {

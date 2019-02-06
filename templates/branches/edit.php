@@ -122,7 +122,7 @@ if ( !empty( $branchInfo[ 'errors' ] ) ) {
 				<?php echo $dayName; ?>
 			</td>
 			<td><input name="branchOpen_<?php echo $num; ?>" type="text" id="branchOpen_<?php echo $num; ?>" value="<?php echo $branchInfo["branchOpen_{$num}"]; ?>" size="5" maxlength="5"/>
-				<input type="checkbox" name="branchOpen_<?php echo $num; ?>PM" id="branchOpen_<?php echo $num; ?>PM" <?php echo ( !empty( $branchInfo[ "branchOpen_{$num}PM"] ) ) ? ' checked="checked"' : NULL; ?> />
+				<input type="checkbox" name="branchOpen_<?php echo $num; ?>AM" id="branchOpen_<?php echo $num; ?>AM" <?php echo ( !empty( $branchInfo[ "branchOpen_{$num}AM"] ) ) ? ' checked="checked"' : NULL; ?> />
 				<?php _e( 'PM', 'book-a-room' ); ?>
 			</td>
 			<td><input name="branchClose_<?php echo $num; ?>" type="text" id="branchClose_<?php echo $num; ?>" value="<?php echo $branchInfo["branchClose_{$num}"]; ?>" size="5" maxlength="5"/>

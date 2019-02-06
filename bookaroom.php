@@ -51,9 +51,10 @@ function my_script_enqueuer() {
 		
 		update_bookaroom_database();
 	}
-	
+	wp_enqueue_script('jquery');
+	wp_enqueue_style( 'jquery_ui_css', "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" );
 	wp_enqueue_script( 'bookaroom_js', plugins_url( 'book-a-room/js/jstree/jquery.jstree.js' ), false );
-	
+	wp_enqueue_script( 'jquery_ui', "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", 'jquery','',false );
 	# languages
 	load_plugin_textdomain( 'book-a-room', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' ); 
 

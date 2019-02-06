@@ -3,12 +3,16 @@
         <div id="topRow">
             <div class="col">
                 <div class="instructionsSmooth">
+                <?php
+                                $user = wp_get_current_user();
+                            ?>
                     <span class="header">
                         <?php _e( 'Step 6.', 'book-a-room' ); ?>
                     </span>
                     <p>
                         <em>
-                            <?php _e( 'Complete the registration form.', 'book-a-room' ); ?>
+                            <?php _e( 'Complete the registration form.', 'book-a-room' ); ?><br />
+                            <?php _e( 'Reservation for ' . $user->data->display_name, 'book-a-room' ); ?>
                         </em>
                     </p>
                     <p><em><strong><?php _e( 'Items marked with an asterisk* are required fields.', 'book-a-room' ); ?></strong></em>
@@ -63,15 +67,6 @@
                         </div>
                         <div class="wideCol">
                             <div class="question">
-                                <label for="eventName">
-                                    <?php _e( 'Event / Organization name', 'book-a-room' ); ?> *</label>
-                            </div>
-                            <div class="formInput">
-                                <input<?php if( !empty( $errorArr[ 'classes'][ 'eventName'] ) ) echo ' class="error"'; ?> name="eventName" type="text" id="eventName" value="<?php echo $externals['eventName']; ?>" size="64" maxlength="255"/>
-                            </div>
-                        </div>
-                        <div class="wideCol">
-                            <div class="question">
                                 <label for="numAtend">
                                     <?php _e( 'Number of attendees', 'book-a-room' ); ?> *</label>
                             </div>
@@ -88,14 +83,9 @@
                                 <textarea<?php if( !empty( $errorArr[ 'classes'][ 'desc'] ) ) echo ' class="error"'; ?> name="desc" rows="3" id="desc"><?php echo htmlspecialchars_decode( $externals['desc'] ); ?></textarea>
                             </div>
                         </div>
-                        <div class="wideCol">
-                            <div class="question">
-                                <label for="contactName">
-                                    <?php _e( 'Contact name', 'book-a-room' ); ?> *</label>
-                            </div>
-                            <div class="formInput">
-                                <input<?php if( !empty( $errorArr[ 'classes'][ 'contactName'] ) ) echo ' class="error"'; ?> name="contactName" type="text" id="contactName" value="<?php echo $externals['contactName']; ?>" size="32" maxlength="64"/>
-                            </div>
+
+                        <div class="formInput">
+                            <input<?php if( !empty( $errorArr[ 'classes'][ 'contactName'] ) ) echo ' class="error"'; ?> name="contactName" type="hidden" id="contactName" value="<?php echo $user->data->display_name; ?>" size="32" maxlength="64"/>
                         </div>
                         <div class="wideCol">
                             <div class="question">&nbsp;&nbsp;</div>
