@@ -41,11 +41,9 @@
 		<?php _e( 'Book a Room - Meeting Reservations', 'book-a-room' ); ?>
 	</h2>
 </div>
-<h2>
-	<?php echo $title; ?>
-</h2>
+<h1><?php echo $user->display_name ?> Profile </h1>
 <?php
-if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
+if ( empty( $final ) ) {
 	?>
 <table class="tableMain">
 	<tr>
@@ -77,14 +75,14 @@ if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
 		</td>
 	</tr>
 	<tr>
-		<td colspan="9" align="center"><strong><?php _e( 'No pending reservations', 'book-a-room' ); ?></strong>
+		<td colspan="9" align="center"><strong><?php _e( 'No reservations', 'book-a-room' ); ?></strong>
 		</td>
 	</tr>
 </table>
 <?php
 } else {
 	?>
-	<form id="form1" name="form1" method="post" action="?page=bookaroom_meetings">
+	<form id="form1" name="form1" method="post" action="<?php echo makeLink_correctPermaLink( get_option( 'bookaroom_reservation_URL' ) ); ?>action=delete ?>">
 		<table class="tableMain freeWidth">
 			<tr>
 				<td><input type="checkbox" name="checkAll" id="checkAll" onClick="toggle(this)"/>
@@ -101,30 +99,16 @@ if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
 				<td>
 					<?php _e( 'Event Name', 'book-a-room' ); ?>
 				</td>
-				<td>
-					<?php _e( 'Contact Name', 'book-a-room' ); ?>
-				</td>
-				<td>
-					<?php _e( 'Contact', 'book-a-room' ); ?>
-				</td>
-				<td>
-					<?php _e( 'Nonprofit', 'book-a-room' ); ?>
-				</td>
-				<td>
-					<?php _e( 'Status', 'book-a-room' ); ?>
-				</td>
 			</tr>
 			<?php
 			$count = 0;
 			
-			foreach ( $pendingList[ 'status' ][ $pendingType ] as $key => $mainKey ) {
+			foreach ( $final as $key => $mainKey ) {
 			
-
-				$val = $pendingList[ 'id' ][ $mainKey ];
-
+                $val = $final[$count];
 				$notes = 0;
 				$noteField = self::noteInformation( $val[ 'contactName' ], $notes );
-				$roomCount = count( $roomContList[ 'id' ][ $val[ 'roomID' ] ][ 'rooms' ] );
+				$roomCount = count( $val['roomID']);
 				if ( empty( $val[ 'nonProfit' ] ) ) {
 					$nonProfit = __( 'No', 'book-a-room' );
 					# find how many increments
@@ -154,12 +138,13 @@ if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
 				?>
 			<tr>
 				<td><input name="res_id[]" type="checkbox" id="res_id[<?php echo $val[ 'res_id' ]; ?>]" value="<?php echo $val[ 'res_id' ]; ?>"/>
+					<input name="timeid[]" type="hidden" id="res_id[<?php echo $val[ 'id' ]; ?>]" value="<?php echo $val[ 'id' ]; ?>"/>
 				</td>
 				<td>
 					<strong>
-						<?php echo $branchList[ $roomContList[ 'id' ][ $val[ 'roomID' ] ][ 'branchID' ] ][ 'branchDesc' ]; ?>
+						<?php echo $val[ 'branchDesc' ]; ?>
 					</strong><br/>
-					<?php echo $roomContList[ 'id' ][ $val[ 'roomID' ] ][ 'desc' ]; ?>
+					<?php echo $val[ 'desc' ]; ?>
 				</td>
 				<td nowrap="nowrap">
 					<?php echo date( 'M. jS, Y', strtotime( $val[ 'startTime' ] ) ); ?><br/>
@@ -173,26 +158,6 @@ if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
 				<td>
 					<?php echo htmlspecialchars_decode( $val[ 'eventName' ] ); ?>
 				</td>
-				<td><a class="btn" data-popup-open="popup-<?php echo $count; ?>" href="#"><?php echo $val[ 'contactName' ]; ?></a><?php if( !empty( $notes ) ) printf( ' (%s)', $notes); ?>
-					<div class="popup" data-popup="popup-<?php echo $count; ?>">
-						<div class="popup-inner">
-							<h2><?php _e( 'Notes', 'book-a-room' ); ?></h2>
-							<?php echo $noteField; ?>
-							<p><a data-popup-close="popup-<?php echo $count; ?>" href="#"><?php _e( 'Close', 'book-a-room' ); ?></a>
-							</p>
-							<a class="popup-close" data-popup-close="popup-<?php echo $count; ?>" href="#">x</a> </div>
-					</div>
-				</td>
-				<td>
-					<p><a href="mailto:<?php echo $val[ 'contactEmail' ]; ?>"><?php echo $val[ 'contactEmail' ]; ?></a><br/> <?php echo self::prettyPhone( $val[ 'contactPhonePrimary' ] ); ?>
-					</p>
-				</td>
-				<td nowrap="nowrap"><strong><?php echo $nonProfit; ?></strong><br/><?php /* translators: Abbreviation for Deposit */ printf( __( 'Dep: $%s<br/>Room: $%s<br/> Due: %s', 'book-a-room' ), $deposit, $roomPrice, date( 'm-d-Y', $mainDate ) ); ?></td>
-				<td align="right" nowrap="nowrap">
-					<p><?php echo $typeArr[ $val[ 'status' ] ]; ?><br/>
-						<a href="?page=bookaroom_meetings&amp;action=view&amp;res_id=<?php echo $val[ 'res_id' ]; ?>"><?php _e( 'View', 'book-a-room' ); ?></a>| <a href="?page=bookaroom_meetings&amp;action=edit&amp;res_id=<?php echo $val[ 'res_id' ]; ?>"><?php _e( 'Edit', 'book-a-room' ); ?></a>
-					</p>
-				</td>
 			</tr>
 			<?php
 			$count++;
@@ -200,16 +165,9 @@ if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
 			?>
 			<tr>
 				<td colspan="9">
-					<select name="status" id="status">
-						<option selected="selected" value="pending"><?php _e( 'New Pending', 'book-a-room' ); ?></option>
-						<option value="pendPayment"><?php _e( 'Pending Payment/501(c)3', 'book-a-room' ); ?></option>
-						<option value="approved"><?php _e( 'Accepted with Payment/501(c)3', 'book-a-room' ); ?></option>
-						<option value="denied"><?php _e( 'Denied', 'book-a-room' ); ?></option>
-						<option value="archived"><?php _e( 'Archived', 'book-a-room' ); ?></option>
-						<option value="delete"><?php _e( 'Delete', 'book-a-room' ); ?></option>
-					</select>
-					<input name="action" type="hidden" id="action" value="changeStatus"/>
-					<input type="submit" name="button" id="button" value="Submit"/>
+                <input name="status" value="delete" type="hidden" />
+                <input name="action" type="hidden" id="action" value="changeStatus"/>
+                <input name="submit" value="Delete" type="submit" />
 				</td>
 			</tr>
 		</table>

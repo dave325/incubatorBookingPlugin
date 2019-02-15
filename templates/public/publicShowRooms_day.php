@@ -1,4 +1,4 @@
-<script language="javascript">
+<script type="text/javascript">
   jQuery( function() {
     var getRemanningDays = function() {
                         var date = new Date();
@@ -21,15 +21,16 @@
         jQuery('#a-tag').attr('href', jQuery('#a-tag').attr('href') + "&timestamp="+ time);
         jQuery('#a-tag').html("Go");
       }
-    })
+      
+    });
   } );
-    function checkSubmit() {
+  function checkSubmit() {
         var hourChecks = document.getElementsByName( 'hours[]' );
 
         var boxCount = 0;
 
         for ( var t = 0, checkLength = hourChecks.length; t < checkLength; t++ ) {
-            if ( hourChecks[ t ].type == 'checkbox' && hourChecks[ t ].checked == true ) {
+            if ( (hourChecks[ t ].type == 'checkbox') && (hourChecks[ t ].checked == true) ) {
                 boxCount++;
             }
         }
@@ -50,7 +51,7 @@
         var lastItem = false;
         // count total boxes checked
         for ( var t = 0, checkLength = hourChecks.length; t < checkLength; t++ ) {
-            if ( hourChecks[ t ].type == 'checkbox' && hourChecks[ t ].checked == true ) {
+            if ( (hourChecks[ t ].type == 'checkbox') && hourChecks[ t ].checked == true ) {
                 boxArr[ boxCount++ ] = t;
             }
         }
@@ -101,17 +102,11 @@
         <div class="col">
             <div class="instructions">
                
-                <p>
-                    <em>
-                        <?php _e('Choose a Room.', 'book-a-room');?>
-                    </em><br/>
-                    <?php _e('Some reservable spaces may combine two or more physical rooms and aren\'t available if any of the single rooms that make them up are already reserved.', 'book-a-room');?>
-                </p>
-            </div>
-            <div class="options">
-                <span class="header">
+            <span class="header">
                     <?php _e('Room List', 'book-a-room');?>
                 </span>
+            </div>
+            <div class="options">
                 <?php
 if (empty($roomContList['branch'][$branchID])) {
     ?>
@@ -163,18 +158,7 @@ if (empty($roomContList['branch'][$branchID])) {
         <div class="col">
             <div class="instructions">
                 <span class="header">
-                    <?php _e('Step 3.', 'book-a-room');?>
-                </span>
-                <p>
-                    <em>
-                        <?php _e('Choose a date.', 'book-a-room');?>
-                    </em><br/>
-                    <?php _e('Once you have chosen a Branch, room and date, the hours that are available will be shown below.', 'book-a-room');?><br/>
-                </p>
-            </div>
-            <div class="options">
-                <span class="header">
-                    <?php _e('Room List', 'book-a-room');?>
+                    <?php _e('Choose Date', 'book-a-room');?>
                 </span>
             </div>
             <?php  if(isset($_GET['timestamp'])){ ?>
@@ -188,6 +172,12 @@ if (empty($roomContList['branch'][$branchID])) {
     <?php
 $reserveBuffer = get_option('bookaroom_reserveBuffer');
 $allowedBuffer = get_option('bookaroom_reserveAllowed');
+# get reservations
+if(isset($_GET['timestamp'])){
+    $timestamp = $_GET['timestamp'];
+}else{
+    $timestamp = current_time('timestamp');
+}
 ?>
 
     <form action="<?php echo makeLink_correctPermaLink(get_option('bookaroom_reservation_URL')); ?>action=reserve" method="post" id="hoursForm">
@@ -203,12 +193,6 @@ $allowedBuffer = get_option('bookaroom_reserveAllowed');
                         <input type="reset" name="Reset" id="resetHours" value="<?php _e('Clear', 'book-a-room');?>"/>
             </div>
             <?php
-# get reservations
-if(isset($_GET['timestamp'])){
-    $timestamp = $_GET['timestamp'];
-}else{
-    $timestamp = current_time('timestamp');
-}
 $dayOfWeek = date_i18n('w', $timestamp);
 $baseIncrement = get_option('bookaroom_baseIncrement');
 $cleanupIncrements = get_option('bookaroom_cleanupIncrement');
@@ -217,6 +201,9 @@ $closings = self::getClosings($roomID, $timestamp, $roomContList);
 $openTime = strtotime(date_i18n('Y-m-d ' . $branchList[$branchID]["branchOpen_{$dayOfWeek}"], $timestamp));
 $reservations = self::getReservations($roomID, $timestamp);
 $setupIncrements = get_option('bookaroom_setupIncrement');
+if(empty($setupIncrements)){
+    $setupIncrements = 0;
+}
 $timeInfo = getdate($timestamp);
 $incrementList = array();
 $increments = (($closeTime - $openTime) / 60) / $baseIncrement;
@@ -314,12 +301,13 @@ $count = 1;
             $incrementList[$i]['type'] = 'last';
         } else {
             if (empty($reservations)) {
+                
                 if ($curStart < current_time('timestamp')) {
                     $incrementList[$i]['type'] = 'unavailable';
-                } else if ($isSameDate && $reservation_constraint < 30) {
+                } else if ($isSameDate and $reservation_constraint < 30) {
+                    echo $i . ': ' . $reservation_constraint;
                     $incrementList[$i]['type'] = 'unavailable';
                 } else {
-                   
                     $incrementList[$i]['type'] = 'regular';
                 }
             } else {
@@ -358,9 +346,12 @@ $count = 1;
                         $validEnd = $validStart + (get_option('bookaroom_reserveAllowed') * 24 * 60 * 60); #reme();
                         $startTime = strtotime($resVal['ti_startTime']);
                         $endTime = strtotime($resVal['ti_endTime']);
-
+                        
+ 
+                        #subtract current time from curStart. go to line 544
+    
                         $admin = current_user_can('activate_plugins');
-                        if ((($startTime <= $validStart || $endTime <= $validStart) && empty($res_id) && $admin == false) || (($startTime >= $validEnd || $endTime >= $validEnd) && empty($res_id) && $admin == false)) {
+                        if ($curStart < current_time('timestamp') || $reservation_constraint < 30 || (($startTime <= $validStart || $endTime <= $validStart) && empty($res_id) && $admin == false) || (($startTime >= $validEnd || $endTime >= $validEnd) && empty($res_id) && $admin == false)) {
                             $incrementList[$i]['type'] = 'unavailable';
                         }
                         if (empty($incrementList[$i]['type'])) {

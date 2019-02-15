@@ -128,7 +128,8 @@
 									   'pendPayment'		=> __( 'Pend. Payment', 'book-a-room' ), 
 									   'approved'			=> __( 'Approved', 'book-a-room' ), 
 									   'denied'				=> __( 'Denied', 'book-a-room' ), 
-									   'archived'			=> __( 'Archived', 'book-a-room' ) );
+									   'archived'			=> __( 'Archived', 'book-a-room' ),
+									   'delete'				=> __( 'Delete', 'book-a-room' ) );
 						
 					# status drop down
 					$selected = ( empty( $externals['status'] ) or !array_key_exists( $externals['status'], $goodArr ) ) ? ' selected="selected"' : null;
@@ -212,11 +213,13 @@ if( !empty( $externals['action'] ) ) {
 			$count = 0;
 			
 			foreach( $pendingList as $key => $val ) {
+				
 				$count++;
 				$notes = 0;
 				$noteInformation = book_a_room_meetings::noteInformation( $val['me_contactName'], $notes )
 		?>
 		<tr>
+		<?php print_r($pendingList); ?>
 			<td><input name="res_id[]" type="checkbox" id="res_id[<?php echo $val['res_id']; ?>]" value="<?php echo $val['res_id']; ?>"/>
 			</td>
 			<td><strong><?php echo $branchList[$roomContList['id'][$val['ti_roomID']]['branchID']]['branchDesc']; ?></strong><br/><?php echo $roomContList['id'][$val['ti_roomID']]['desc']; ?>
@@ -246,7 +249,7 @@ if( !empty( $externals['action'] ) ) {
 				if( empty( $val['me_nonProfit'] ) ) {
 					# find how many increments
 					$minutes = ( ( strtotime( $val['ti_endTime'] ) - strtotime( $val['ti_startTime'] ) ) / 60 ) / $option['bookaroom_baseIncrement'] ;
-					$roomPrice = $minutes * $option['bookaroom_profitIncrementPrice'] * $roomCount;
+					$roomPrice = $minutes * 0 * $roomCount;
 					$deposit = 	intval( $option['bookaroom_profitDeposit'] );
 				} else {
 					# find how many increments
@@ -257,7 +260,7 @@ if( !empty( $externals['action'] ) ) {
 				?>
 			<td nowrap="nowrap"><strong><?php echo $nonProfit; ?></strong><br/><?php printf( __( 'Dep: $ %s', 'book-a-room' ), $deposit ); ?><br/><?php printf( __( 'Room: $ %s', 'book-a-room' ), $roomPrice ); ?></td>
 			<td align="right" nowrap="nowrap">
-				<p><?php echo $statusArr[$val['me_status']]; ?><br/>
+				<p><?php echo $val['me_status']; ?><br/>
 					<a href="?page=bookaroom_meetings&amp;action=view&amp;res_id=<?php echo $val['res_id']; ?>" target="_new"><?php _e( 'View', 'book-a-room' ); ?></a> | <a href="?page=bookaroom_meetings&amp;action=edit&amp;res_id=<?php echo $val['res_id']; ?>" target="_new"><?php _e( 'Edit', 'book-a-room' ); ?></a>
 			</td>
 		</tr>
@@ -272,6 +275,7 @@ if( !empty( $externals['action'] ) ) {
 					<option value="approved"><?php _e( 'Accepted with Payment/501(c)3', 'book-a-room' ); ?></option>
 					<option value="denied"><?php _e( 'Denied', 'book-a-room' ); ?></option>
 					<option value="archived"><?php _e( 'Archived', 'book-a-room' ); ?></option>
+					<option value="delete"><?php _e( 'Delete', 'book-a-room' ); ?></option>
 				</select> <input name="action" type="hidden" id="action" value="changeStatus"/>
 				<input type="submit" name="button" id="button" value="<?php _e( 'Submit', 'book-a-room' ); ?>"/>
 			</td>

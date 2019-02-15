@@ -28,7 +28,6 @@ class bookaroom_public
     {
         # get external variables from GET and POST
         $externals = self::getExternalsPublic();
-
         # includes
         require_once BOOKAROOM_PATH . '/bookaroom-meetings-rooms.php';
         require_once BOOKAROOM_PATH . '/bookaroom-meetings-branches.php';
@@ -84,7 +83,11 @@ class bookaroom_public
                 $timestamp = self::makeTimestamp($externals);
                 return self::showRooms_day($externals['roomID'], $externals['branchID'], $timestamp, $branchList, $roomContList, $roomList, $amenityList, $cityList);
                 break;
-
+            case 'changeStatus':
+                $externals = filter_input_array(INPUT_POST);
+				self::changeStatus( $externals, $branchList, $roomContList, $amenityList );				
+				break;
+				
             case 'reserve':
                 if (empty($externals['roomID'])) {
                     return self::showRooms($branchList, $roomContList, $roomList, $amenityList);
@@ -100,7 +103,97 @@ class bookaroom_public
                 break;
         }
     }
+    protected static
+	function changeStatus( $externals, $branchList, $roomContList, $amenityList ) {
+		global $wpdb;
+        $arr = array();
+		for($i = 0; $i < count($externals['res_id']); $i++){
+            $temp = array(
+                'resid' => $externals['res_id'][$i],
+                'timeid' => $externals['timeid'][$i]
+            );
+            array_push($arr, $temp);
+        }
 
+        $user = wp_get_current_user();
+        $table_nameRes = $wpdb->prefix . 'bookaroom_reservations';
+        $table_name = $wpdb->prefix . 'bookaroom_times';
+        $where = "`res`.`me_contactName` = '{$user->data->display_name}' ";
+        $option[ 'bookaroom_profitDeposit' ] = get_option( 'bookaroom_profitDeposit' );
+		$option[ 'bookaroom_nonProfitDeposit' ] = get_option( 'bookaroom_nonProfitDeposit' );
+		$option[ 'bookaroom_profitIncrementPrice' ] = get_option( 'bookaroom_profitIncrementPrice' );
+		$option[ 'bookaroom_nonProfitIncrementPrice' ] = get_option( 'bookaroom_nonProfitIncrementPrice' );
+		$option[ 'bookaroom_baseIncrement' ] = get_option( 'bookaroom_baseIncrement' );
+        $sql = "SELECT 					`res`.`res_id`, 
+        `ti`.`ti_id` as `id`, 
+        `ti`.`ti_startTime` as `startTime`, 
+        `ti`.`ti_endTime` as `endTime`, 
+        `ti`.`ti_roomID` as `roomID`, 
+        `ti`.`ti_created` as `created`, 
+        `ti`.`ti_type` as `type`, 
+        `ti`.`ti_noLocation_branch` as `noLocation_branch`, 
+        
+        IF( `ti`.`ti_type` = 'meeting', `res`.`me_eventName`, `res`.`ev_title` ) as `eventName`, 
+        IF( `ti`.`ti_type` = 'meeting', `res`.`me_desc`, `res`.`ev_desc` ) as `desc`, 
+        
+        
+        `res`.`me_numAttend` as `numAttend`, 
+        IF( `ti`.`ti_type` = 'meeting', `res`.`me_contactName`, `res`.`ev_publicName` ) as `contactName`, 
+                            
+        `res`.`me_libcardNum` as `libcardNum`, 
+        `res`.`me_social` as `isSocial`, 
+        `res`.`me_contactPhonePrimary` as `contactPhonePrimary`, 
+        `res`.`me_contactPhoneSecondary` as `contactPhoneSecondary`, 
+        `res`.`me_contactAddress1` as `contactAddress1`, 
+        `res`.`me_contactAddress2` as `contactAddress2`, 
+        `res`.`me_contactCity` as `contactCity`, 
+        `res`.`me_contactState` as `contactState`, 
+        `res`.`me_contactZip` as `contactZip`, 
+        `res`.`me_contactEmail` as `contactEmail`, 
+        `res`.`me_contactWebsite` as `contactWebsite`, 
+        `res`.`me_nonProfit` as `nonProfit`, 
+        `res`.`me_amenity` as `amenity`, 
+        `res`.`me_status` as `status`, 
+        `res`.`me_notes` as `notes`,
+        `branch`.`branchDesc` as `branchDesc`
+        FROM `{$table_name}` as `ti` 
+				LEFT JOIN `{$table_nameRes}` as `res` ON `ti`.`ti_extID` = `res`.`res_id` 
+				LEFT JOIN `{$wpdb->prefix}bookaroom_roomConts` as `cont` ON `ti`.`ti_roomID` = `cont`.`roomCont_ID` 
+                LEFT JOIN `{$wpdb->prefix}bookaroom_branches` as `branch` ON `cont`.`roomCont_branch` = `branch`.`branchID` 
+        WHERE `res`.`me_contactName` = '{$user->data->display_name}'";
+        $final = $wpdb->get_results($sql, ARRAY_A);
+			# get correct status email
+			# status that required an outgoing email: pendPayment, denied, accepted.
+
+			$sendMail = FALSE;
+			$needHash = FALSE;
+
+			switch ( $externals[ 'status' ] ) {
+				case 'delete':
+					$delete = TRUE;
+			}
+            $i = 0;
+			# SEND EMAIL
+			foreach ( $arr as $val ) {
+				if($delete == true){
+					# UPDATE DATABASE
+					$table_name = $wpdb->prefix . "bookaroom_times";
+					$table_nameRes = $wpdb->prefix . "bookaroom_reservations";
+				$wpdb->delete(	$table_nameRes, 
+						array( 'res_id' => $val['resid'] ) );
+
+				$wpdb->delete(	$table_name, 
+						array( 
+							'ti_id' => $val['timeid']
+						));
+
+				}
+				
+			}
+
+		$_SESSION['showData'] = $final;
+		echo "Successfully deleted!";
+	}
     public static function showForm_checkHoursError($startTime, $endTime, $roomContID, $roomContList, $branchList, $res_id = null)
     {
         global $wpdb;
@@ -194,7 +287,7 @@ class bookaroom_public
             'session' => FILTER_SANITIZE_STRING,
             'startTime' => FILTER_SANITIZE_STRING,
             'timestamp' => FILTER_SANITIZE_STRING);
-
+        
         # pull in and apply to final
         if ($postTemp = filter_input_array(INPUT_POST, $postArr)) {
             $final = array_merge($final, $postTemp);
@@ -443,26 +536,20 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
  *     Sumaita make changes based on the db tables created
  */
         $table_name = $wpdb->prefix . "bookaroom_reservations";
+        $pending = false;
+        if( !empty( $event ) ) {
+			$event = TRUE;
+			$pending = 'approved';
+		} else {
+			$event = TRUE;
+			$pending = 'approved';
+		}
         $final = $wpdb->insert($table_name, array(
             'res_created' => $currentTimeMySQL,
             'me_numAttend' => $externals['numAttend'],
             'me_eventName' => esc_textarea($externals['eventName']),
             'me_desc' => esc_textarea($externals['desc']),
             'me_contactName' => esc_textarea($externals['contactName']),
-            'me_contactPhonePrimary' => $externals['contactPhonePrimary'],
-            'me_contactPhoneSecondary' => $externals['contactPhoneSecondary'],
-            'me_contactAddress1' => esc_textarea($externals['contactAddress1']),
-            'me_contactAddress2' => esc_textarea($externals['contactAddress2']),
-            'me_contactCity' => $cityName,
-            'me_contactState' => $externals['contactState'],
-            'me_contactZip' => $externals['contactZip'],
-            'me_contactEmail' => esc_textarea($externals['contactEmail']),
-            'me_contactWebsite' => esc_textarea($externals['contactWebsite']),
-            'me_nonProfit' => $nonProfit,
-            'me_amenity' => $amenity,
-            'me_notes' => esc_textarea($externals['notes']),
-            'me_libcardNum' => esc_textarea($externals['libcardNum']),
-            'me_social' => $social,
             'me_status' => $pending));
         $table_name = $wpdb->prefix . "bookaroom_times";
         $final = $wpdb->insert($table_name, array(
@@ -555,7 +642,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
      * @param [type] $branchList
      * @param boolean $admin
      * @return void
-     *
+     */
     public static function sendAlertEmail( $externals, $amenityList, $roomContList, $branchList, $admin = false )
     {
     $filename = BOOKAROOM_PATH . 'templates/public/adminNewRequestAlert.html';
@@ -603,13 +690,13 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
     $subject = sprintf( __( 'Book a Room Event Created: %s [%s] by %s on %s from %s to %s', 'book-a-room' ), $externals['branchName'], $externals['roomName'], $externals['contactName'], $externals['formDate'], $externals['startTimeDisp'], $externals['endTimeDisp'] );
 
     mail( $email, $subject, $contents, $headers );
-
+    */
     if( $admin == true ) {
     $subject = sprintf( __( 'Your Book a Room Event Details: %s [%s] by %s on %s from %s to %s', 'book-a-room' ), $externals['branchName'], $externals['roomName'], $externals['contactName'], $externals['formDate'], $externals['startTimeDisp'], $externals['endTimeDisp'] );
     mail( $contactEmail, $subject, $contents, $headers );
     }
     }
-     */
+     
 
     public static function sendCustomerReceiptEmail($externals, $amenityList, $roomContList, $branchList, $internal = false)
     {

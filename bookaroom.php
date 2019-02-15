@@ -14,6 +14,7 @@ $bookaroom_db_version = "3";
 
 define( 'BOOKAROOM_PATH', plugin_dir_path( __FILE__ ) );
 require_once( BOOKAROOM_PATH . 'bookaroom-meetings-public.php' );
+require_once( BOOKAROOM_PATH . 'bookaroom-company-profile.php' );
 require_once( BOOKAROOM_PATH . 'sharedFunctions.php' );
 
 register_activation_hook( __FILE__, array( 'bookaroom_init', 'on_activate' ) );
@@ -36,7 +37,7 @@ add_action( 'admin_menu', array( 'bookaroom_settings', 'add_settingsPage' ) );
 function my_script_enqueuer() {
 	
 	add_shortcode( 'meetingRooms',	array( 'bookaroom_public', 'mainForm' ) );
-	
+	add_shortcode( 'profile',	array( 'bookaroom_company_profile', 'showBookings' ) );
 	$width = get_option( 'bookaroom_screenWidth' );
 
 	if( !empty( $width ) || $width == 1 ) {

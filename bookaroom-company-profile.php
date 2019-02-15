@@ -1,16 +1,75 @@
 <?PHP
-class book_a_room_meetings
+class bookaroom_company_profile
 {
 	############################################
 	#
-	# Meetings managment
+	# Company Profile
 	#
 	############################################
-	public static function bookaroom_admin()
-	{
-		self::bookaroom_pendingRequests( 'all' );
-	}
-	
+    # main funcion - initialize and search for action variable.
+    # if no action, return the regular content
+    public static function form($val)
+    {
+        return $val;
+    }
+	public static function showBookings(){
+        global $wpdb;
+        $final = array();
+        $user = wp_get_current_user();
+        $table_nameRes = $wpdb->prefix . 'bookaroom_reservations';
+        $table_name = $wpdb->prefix . 'bookaroom_times';
+        $where = "`res`.`me_contactName` = '{$user->data->display_name}' ";
+        $option[ 'bookaroom_profitDeposit' ] = get_option( 'bookaroom_profitDeposit' );
+		$option[ 'bookaroom_nonProfitDeposit' ] = get_option( 'bookaroom_nonProfitDeposit' );
+		$option[ 'bookaroom_profitIncrementPrice' ] = get_option( 'bookaroom_profitIncrementPrice' );
+		$option[ 'bookaroom_nonProfitIncrementPrice' ] = get_option( 'bookaroom_nonProfitIncrementPrice' );
+		$option[ 'bookaroom_baseIncrement' ] = get_option( 'bookaroom_baseIncrement' );
+        $sql = "SELECT 					`res`.`res_id`, 
+        `ti`.`ti_id` as `id`, 
+        `ti`.`ti_startTime` as `startTime`, 
+        `ti`.`ti_endTime` as `endTime`, 
+        `ti`.`ti_roomID` as `roomID`, 
+        `ti`.`ti_created` as `created`, 
+        `ti`.`ti_type` as `type`, 
+        `ti`.`ti_noLocation_branch` as `noLocation_branch`, 
+        
+        IF( `ti`.`ti_type` = 'meeting', `res`.`me_eventName`, `res`.`ev_title` ) as `eventName`, 
+        IF( `ti`.`ti_type` = 'meeting', `res`.`me_desc`, `res`.`ev_desc` ) as `desc`, 
+        
+        
+        `res`.`me_numAttend` as `numAttend`, 
+        IF( `ti`.`ti_type` = 'meeting', `res`.`me_contactName`, `res`.`ev_publicName` ) as `contactName`, 
+                            
+        `res`.`me_libcardNum` as `libcardNum`, 
+        `res`.`me_social` as `isSocial`, 
+        `res`.`me_contactPhonePrimary` as `contactPhonePrimary`, 
+        `res`.`me_contactPhoneSecondary` as `contactPhoneSecondary`, 
+        `res`.`me_contactAddress1` as `contactAddress1`, 
+        `res`.`me_contactAddress2` as `contactAddress2`, 
+        `res`.`me_contactCity` as `contactCity`, 
+        `res`.`me_contactState` as `contactState`, 
+        `res`.`me_contactZip` as `contactZip`, 
+        `res`.`me_contactEmail` as `contactEmail`, 
+        `res`.`me_contactWebsite` as `contactWebsite`, 
+        `res`.`me_nonProfit` as `nonProfit`, 
+        `res`.`me_amenity` as `amenity`, 
+        `res`.`me_status` as `status`, 
+        `res`.`me_notes` as `notes`,
+        `branch`.`branchDesc` as `branchDesc`
+        FROM `{$table_name}` as `ti` 
+				LEFT JOIN `{$table_nameRes}` as `res` ON `ti`.`ti_extID` = `res`.`res_id` 
+				LEFT JOIN `{$wpdb->prefix}bookaroom_roomConts` as `cont` ON `ti`.`ti_roomID` = `cont`.`roomCont_ID` 
+                LEFT JOIN `{$wpdb->prefix}bookaroom_branches` as `branch` ON `cont`.`roomCont_branch` = `branch`.`branchID` 
+        WHERE `res`.`me_contactName` = '{$user->data->display_name}'";
+        $final = $wpdb->get_results($sql, ARRAY_A);
+        ob_start();
+        // Need to edit based on existing forms and data
+        require BOOKAROOM_PATH . 'company_profile.php';
+        $final = ob_get_contents();
+        ob_end_clean();
+        return $final;
+      
+    }
 	public static function bookaroom_pendingRequests( $pendingType )
 	{	
 		$typeArr = array( 'pending', 'pendPayment', '501C3', 'approved', 'denied', 'archived', 'all' );
@@ -19,7 +78,6 @@ class book_a_room_meetings
 		if( empty( $pendingType ) or !in_array( $pendingType, $typeArr) ) {
 			$pendingType = 'pending';
 		}
-		
 		# make lines
 		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-amenities.php' );
 		require_once( BOOKAROOM_PATH . '/bookaroom-meetings-rooms.php' );
@@ -94,7 +152,7 @@ class book_a_room_meetings
 				
 			case 'changeStatus':
 				if( empty( $externals['res_id'] ) ) {
-					print_r($pendingList['id']);
+
 					self::showError( 'res_id', $externals['res_id'] );
 					break;
 				}
@@ -112,7 +170,7 @@ class book_a_room_meetings
 					$externals['resList'] = $externals['res_id'];
 				}
 				
-				self::changeStatus( $externals, $pendingList, $branchList, $roomContList, $amenityList );				
+				//self::changeStatus( $externals, $pendingList, $branchList, $roomContList, $amenityList );				
 				break;
 				
 			case 'edit':

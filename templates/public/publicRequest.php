@@ -83,14 +83,13 @@
                                 <textarea<?php if( !empty( $errorArr[ 'classes'][ 'desc'] ) ) echo ' class="error"'; ?> name="desc" rows="3" id="desc"><?php echo htmlspecialchars_decode( $externals['desc'] ); ?></textarea>
                             </div>
                         </div>
-
-                        <div class="formInput">
-                            <input<?php if( !empty( $errorArr[ 'classes'][ 'contactName'] ) ) echo ' class="error"'; ?> name="contactName" type="hidden" id="contactName" value="<?php echo $user->data->display_name; ?>" size="32" maxlength="64"/>
-                        </div>
                         <div class="wideCol">
                             <div class="question">&nbsp;&nbsp;</div>
                             <div class="formInput">
+                                <input<?php if( !empty( $errorArr[ 'classes'][ 'contactName'] ) ) echo ' class="error"'; ?> name="contactName" type="hidden" id="contactName" value="<?php echo $user->data->display_name; ?>" size="32" maxlength="64"/>
                                 <input name="startTime" type="hidden" id="startTime" value="<?php echo  $externals['startTime']; ?>"/>
+                                <input name="eventName" type="hidden" id="eventName" value="<?php echo $user->data->display_name ?>" size="64" maxlength="255"/>
+                                <input name="contactEmail" type="hidden" id="contactEmail" value="<?php echo $user->data->user_email ?>" size="64" maxlength="255"/>
                                 <input name="endTime" type="hidden" id="endTime" value="<?php echo  $externals['endTime']; ?>"/>
                                 <input name="roomID" type="hidden" id="roomID" value="<?php echo $roomContID; ?>"/>
                                 <input name="action" type="hidden" id="action" value="<?php echo $externals['action']; ?>"/>
