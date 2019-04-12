@@ -118,7 +118,7 @@ if ( empty( $pendingList[ 'status' ][ $pendingType ] ) ) {
 			$count = 0;
 			
 			foreach ( $pendingList[ 'status' ][ $pendingType ] as $key => $mainKey ) {
-			
+			print_r( $pendingList); 
 
 				$val = $pendingList[ 'id' ][ $mainKey ];
 

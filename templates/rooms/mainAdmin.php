@@ -54,27 +54,15 @@ if ( is_null( $roomList ) or!is_array( $roomList ) or count( $roomList ) == 0 ) 
 		</tr>
 		<?php
 			} else {
+				echo "<pre>";
+				print_r($roomList[ 'room' ][ $b_key ]);
+				echo "</pre>";
 				foreach ( $roomList[ 'room' ][ $b_key ] as $r_key => $r_val ) {
-					if ( count( $roomList[ 'id' ][ $r_key ][ 'amenity' ] ) == 0 ){
-						$amenityListArr = __( 'None', 'book-a-room' ); 
-					} else {
-						$a_list = array();
-						foreach ( $roomList[ 'id' ][ $r_key ][ 'amenity' ] as $a_key => $a_val ) {
-							if( !empty( $amenityList[ $a_val ] ) ) {
-								$a_list[] = $amenityList[ $a_val ];
-							}
-						}
-						$amenityListArr = implode( ', ', $a_list );
-					}
 				?>
 		<tr>
 			<td class="bufferLeft"><strong><?php echo $r_val; ?></strong>
 			</td>
 			<td><a href="?page=bookaroom_Settings_Rooms&branchID=<?php echo $b_key; ?>&roomID=<?php echo $r_key; ?>&action=edit"><?php _e( 'Edit', 'book-a-room' ); ?></a> | <a href="?page=bookaroom_Settings_Rooms&branchID=<?php echo $b_key; ?>&roomID=<?php echo $r_key; ?>&action=delete"><?php _e( 'Delete', 'book-a-room' ); ?></a>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" class="bufferLeftDouble"><em><?php _e( 'Amenities', 'book-a-room' ); ?>: <?php echo $amenityListArr; ?></em>
 			</td>
 		</tr>
 		<?php

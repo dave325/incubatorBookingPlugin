@@ -32,15 +32,11 @@ class bookaroom_public
         require_once BOOKAROOM_PATH . '/bookaroom-meetings-rooms.php';
         require_once BOOKAROOM_PATH . '/bookaroom-meetings-branches.php';
         require_once BOOKAROOM_PATH . '/bookaroom-meetings-roomConts.php';
-        require_once BOOKAROOM_PATH . '/bookaroom-meetings-closings.php';
 
         # vaiables from includes
         $roomContList = bookaroom_settings_roomConts::getRoomContList(true);
         $roomList = bookaroom_settings_rooms::getRoomList();
         $branchList = bookaroom_settings_branches::getBranchList(true, true);
-        $amenityList = null;
-        $cityList = null;
-        $realAmenityList = null;
         # check action
         switch ($externals['action']) {
             case 'checkForm':
@@ -48,12 +44,12 @@ class bookaroom_public
                 if (($errorMSG = self::showForm_checkHoursError($externals['startTime'], $externals['endTime'], $externals['roomID'], $roomContList, $branchList)) == true) {
 
                     return self::showForm_hoursError($errorMSG, $externals);
-                } elseif (false !== ($errorArr = self::showForm_checkErrors($externals, $branchList, $roomContList, $roomList, $amenityList, $cityList))) {
-                    return self::showForm_publicRequest($externals['roomID'], $branchList, $roomContList, $roomList, $realAmenityList, $cityList, $externals, $errorArr);
+                } elseif (false !== ($errorArr = self::showForm_checkErrors($externals, $branchList, $roomContList, $roomList))) {
+                    return self::showForm_publicRequest($externals['roomID'], $branchList, $roomContList, $roomList, $externals, $errorArr);
                 } else {
-                    self::sendAlertEmail($externals, $amenityList, $roomContList, $branchList);
-                    self::showForm_insertNewRequest($externals, null, $cityList);
-                    return self::sendCustomerReceiptEmail($externals, $amenityList, $roomContList, $branchList);
+                    self::sendAlertEmail($externals,  $roomContList, $branchList);
+                    self::showForm_insertNewRequest($externals, null);
+                    return self::sendCustomerReceiptEmail($externals,  $roomContList, $branchList);
                 }
 
                 break;
@@ -75,36 +71,36 @@ class bookaroom_public
                 if (($errorMSG = self::showForm_checkHoursError($externals['startTime'], $externals['endTime'], $externals['roomID'], $roomContList, $branchList)) == true) {
                     return self::showForm_hoursError($errorMSG, $externals);
                 } else {
-                    return self::showForm_publicRequest($externals['roomID'], $branchList, $roomContList, $roomList, $realAmenityList, $cityList, $externals);
+                    return self::showForm_publicRequest($externals['roomID'], $branchList, $roomContList, $roomList, $externals);
                 }
                 break;
 
             case 'calDate':
                 $timestamp = self::makeTimestamp($externals);
-                return self::showRooms_day($externals['roomID'], $externals['branchID'], $timestamp, $branchList, $roomContList, $roomList, $amenityList, $cityList);
+                return self::showRooms_day($externals['roomID'], $externals['branchID'], $timestamp, $branchList, $roomContList, $roomList );
                 break;
             case 'changeStatus':
                 $externals = filter_input_array(INPUT_POST);
-				self::changeStatus( $externals, $branchList, $roomContList, $amenityList );				
+				self::changeStatus( $externals, $branchList, $roomContList  );				
 				break;
 				
             case 'reserve':
                 if (empty($externals['roomID'])) {
-                    return self::showRooms($branchList, $roomContList, $roomList, $amenityList);
+                    return self::showRooms($branchList, $roomContList, $roomList );
                     break;
                 }
-                return self::showRooms_day($externals['roomID'], $externals['branchID'], $externals['timestamp'], $branchList, $roomContList, $roomList, $amenityList, $cityList);
+                return self::showRooms_day($externals['roomID'], $externals['branchID'], $externals['timestamp'], $branchList, $roomContList, $roomList );
 
                 break;
 
             default:
                 $_SESSION['savedMeetingFormVals'] = null;
-                return self::showRooms($branchList, $roomContList, $roomList, $amenityList);
+                return self::showRooms($branchList, $roomContList, $roomList );
                 break;
         }
     }
     protected static
-	function changeStatus( $externals, $branchList, $roomContList, $amenityList ) {
+	function changeStatus( $externals, $branchList, $roomContList  ) {
 		global $wpdb;
         $arr = array();
 		for($i = 0; $i < count($externals['res_id']); $i++){
@@ -119,10 +115,6 @@ class bookaroom_public
         $table_nameRes = $wpdb->prefix . 'bookaroom_reservations';
         $table_name = $wpdb->prefix . 'bookaroom_times';
         $where = "`res`.`me_contactName` = '{$user->data->display_name}' ";
-        $option[ 'bookaroom_profitDeposit' ] = get_option( 'bookaroom_profitDeposit' );
-		$option[ 'bookaroom_nonProfitDeposit' ] = get_option( 'bookaroom_nonProfitDeposit' );
-		$option[ 'bookaroom_profitIncrementPrice' ] = get_option( 'bookaroom_profitIncrementPrice' );
-		$option[ 'bookaroom_nonProfitIncrementPrice' ] = get_option( 'bookaroom_nonProfitIncrementPrice' );
 		$option[ 'bookaroom_baseIncrement' ] = get_option( 'bookaroom_baseIncrement' );
         $sql = "SELECT 					`res`.`res_id`, 
         `ti`.`ti_id` as `id`, 
@@ -192,7 +184,9 @@ class bookaroom_public
 			}
 
 		$_SESSION['showData'] = $final;
-		echo "Successfully deleted!";
+        echo "Successfully deleted!<br />";
+        echo "<a href='https://techincubatorqc.com/https://techincubatorqc.com/elementor-2375/'>Go back to profile</a><br>";
+        echo "<a href='https://techincubatorqc.com/members/'>Reserve a room</a>";
 	}
     public static function showForm_checkHoursError($startTime, $endTime, $roomContID, $roomContList, $branchList, $res_id = null)
     {
@@ -292,7 +286,6 @@ class bookaroom_public
         if ($postTemp = filter_input_array(INPUT_POST, $postArr)) {
             $final = array_merge($final, $postTemp);
         }
-
         $arrayCheck = array_unique(array_merge(array_keys($getArr), array_keys($postArr)));
 
         foreach ($arrayCheck as $key):
@@ -308,48 +301,6 @@ class bookaroom_public
         return $final;
     }
 
-    public static function getClosings($roomID, $timestamp, $roomContList)
-    {
-        global $wpdb;
-        # create date information
-        $dateInfo = getdate($timestamp);
-
-        $table_name = $wpdb->prefix . "bookaroom_closings";
-
-        $sql = "SELECT `allClosed` , `roomsClosed`, `closingName`
-					FROM `{$table_name}`
-					WHERE
-(
-					`type` = 'range' AND
-				 	`reoccuring` = '0' AND
-UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( startYear AS CHAR ), LPAD( CAST( startMonth AS CHAR ), 2, '00'), LPAD( CAST( startDay AS CHAR ), 2, '00') ) ) <= UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAST( '{$dateInfo['mon']}' AS CHAR ), 2, '00'), LPAD( CAST( '{$dateInfo['mday']}' AS CHAR ), 2, '00') ) ) AND
-UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( endYear AS CHAR ), LPAD( CAST( endMonth AS CHAR ), 2, '00'), LPAD( CAST( endDay AS CHAR ), 2, '00') ) ) >=
-UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAST( '{$dateInfo['mon']}' AS CHAR ), 2, '00'), LPAD( CAST( '{$dateInfo['mday']}' AS CHAR ), 2, '00') ) )
-					) OR
-					(
-								`type` = 'date' AND
-							 	`reoccuring` = '0' AND
-								`startDay` = '{$dateInfo['mday']}' AND
-								`startMonth` = '{$dateInfo['mon']}' AND
-								`startYear` = '{$dateInfo['year']}') OR
-					(`type` = 'date' AND `reoccuring` ='1' AND `startDay` = '{$dateInfo['mday']}' AND `startMonth` = '{$dateInfo['mon']}') OR
-					(`type` = 'range' AND `reoccuring` ='0' AND ('{$dateInfo['mday']}' >= `startDay` AND '{$dateInfo['mday']}' <= `endDay`) AND ('{$dateInfo['mon']}' >= `startMonth` AND '{$dateInfo['mon']}' <= `endMonth`) AND ('{$dateInfo['year']}' >= `startYear` AND '{$dateInfo['year']}' <= `endYear`) ) OR
-(`type` = 'range' AND `reoccuring` ='1' AND ('{$dateInfo['mday']}' >= `startDay` AND '{$dateInfo['mday']}' <= `endDay`) AND ('{$dateInfo['mon']}' >= `startMonth` AND '{$dateInfo['mon']}' <= `endMonth`))";
-
-        $raw = $wpdb->get_results($sql, ARRAY_A);
-        foreach ($raw as $key => $val) {
-            if ($val['allClosed'] == '1') {
-                return $val['closingName'];
-            }
-
-            $rooms = unserialize($val['roomsClosed']);
-            if (count(array_intersect($roomContList['id'][$roomID]['rooms'], $rooms)) !== 0) {
-                return $val['closingName'];
-            }
-        }
-
-        return false;
-    }
 
     public static function getReservations($roomID, $timestamp, $timeEnd = null, $res_id = null)
     # use timestamp only to get all day's reservation.
@@ -363,17 +314,15 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
             $startTime = date('Y-m-d H:i:s', mktime(0, 0, 0, $timeInfo['mon'], $timeInfo['mday'], $timeInfo['year']));
             $endTime = date('Y-m-d H:i:s', mktime(0, 0, 0, $timeInfo['mon'], $timeInfo['mday'] + 1, $timeInfo['year']) - 1);
         } else {
-            $increment = get_option('bookaroom_baseIncrement');
-            $startTime = date('Y-m-d H:i:s', $timestamp + ($increment * 60 * 5));
-            $endTime = date('Y-m-d H:i:s', $timeEnd + ($increment * 60 * 5));
+           $increment = get_option('bookaroom_baseIncrement');
+            $startTime = date('Y-m-d H:i:s', $timestamp );
+            $endTime = date('Y-m-d H:i:s', $timeEnd );
         }
-
         if (!empty($res_id)) {
             $where = " AND `res`.`res_id` != '{$res_id}'";
         } else {
             $where = null;
         }
-
         /***
          * Rewrite By David
          *     Sumaita
@@ -422,12 +371,6 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return $externals;
     }
 
-    public static function getStates()
-    {
-        return array('AL' => "Alabama", 'AK' => "Alaska", 'AZ' => "Arizona", 'AR' => "Arkansas", 'CA' => "California", 'CO' => "Colorado", 'CT' => "Connecticut", 'DE' => "Delaware", 'DC' => "District Of Columbia", 'FL' => "Florida", 'GA' => "Georgia", 'HI' => "Hawaii", 'ID' => "Idaho", 'IL' => "Illinois", 'IN' => "Indiana", 'IA' => "Iowa", 'KS' => "Kansas", 'KY' => "Kentucky", 'LA' => "Louisiana", 'ME' => "Maine", 'MD' => "Maryland", 'MA' => "Massachusetts", 'MI' => "Michigan", 'MN' => "Minnesota", 'MS' => "Mississippi", 'MO' => "Missouri", 'MT' => "Montana", 'NE' => "Nebraska", 'NV' => "Nevada", 'NH' => "New Hampshire", 'NJ' => "New Jersey", 'NM' => "New Mexico", 'NY' => "New York", 'NC' => "North Carolina", 'ND' => "North Dakota", 'OH' => "Ohio", 'OK' => "Oklahoma", 'OR' => "Oregon", 'PA' => "Pennsylvania", 'RI' => "Rhode Island", 'SC' => "South Carolina", 'SD' => "South Dakota", 'TN' => "Tennessee", 'TX' => "Texas", 'UT' => "Utah", 'VT' => "Vermont", 'VA' => "Virginia", 'WA' => "Washington", 'WV' => "West Virginia", 'WI' => "Wisconsin", 'WY' => "Wyoming");
-
-    }
-
     protected static function makeTimestamp($externals)
     {
         $curTimeInfo = getdate(current_time('timestamp'));
@@ -450,7 +393,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
 
     }
 
-    public static function showForm_checkErrors(&$externals, $branchList, $roomContList, $roomList, $amenityList, $cityList)
+    public static function showForm_checkErrors(&$externals, $branchList, $roomContList, $roomList)
     {
         $final = array();
 
@@ -526,7 +469,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return $final;
     }
 
-    public static function showForm_insertNewRequest($externals, $event = null, $cityList)
+    public static function showForm_insertNewRequest($externals, $event = null)
     {
         global $wpdb;
 
@@ -550,6 +493,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
             'me_eventName' => esc_textarea($externals['eventName']),
             'me_desc' => esc_textarea($externals['desc']),
             'me_contactName' => esc_textarea($externals['contactName']),
+            'me_contactEmail' => esc_textarea($externals['contactEmail']),
             'me_status' => $pending));
         $table_name = $wpdb->prefix . "bookaroom_times";
         $final = $wpdb->insert($table_name, array(
@@ -562,7 +506,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return true;
     }
 
-    public static function showForm_publicRequest($roomContID, $branchList, $roomContList, $roomList, $amenityList, $cityList, $externals, $errorArr = null, $edit = null)
+    public static function showForm_publicRequest($roomContID, $branchList, $roomContList, $roomList, $externals, $errorArr = null, $edit = null)
     {
 
         ob_start();
@@ -581,7 +525,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return $final;
     }
 
-    protected static function showRooms($branchList, $roomContList, $roomList, $amenityList)
+    protected static function showRooms($branchList, $roomContList, $roomList )
     {
         ob_start();
         // Initial page that will show a list of rooms available to book
@@ -594,7 +538,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return $final;
 
     }
-    public static function showRooms_day($roomID, $branchID, $timestamp, $branchList, $roomContList, $roomList, $amenityList, $cityList)
+    public static function showRooms_day($roomID, $branchID, $timestamp, $branchList, $roomContList, $roomList)
     {
         # get branch and room
         # if Room ID is not empty and is valid
@@ -637,13 +581,13 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
      * Removed By David
      *
      * @param [type] $externals
-     * @param [type] $amenityList
+     * @param [type] 
      * @param [type] $roomContList
      * @param [type] $branchList
      * @param boolean $admin
      * @return void
      */
-    public static function sendAlertEmail( $externals, $amenityList, $roomContList, $branchList, $admin = false )
+    public static function sendAlertEmail( $externals,  $roomContList, $branchList, $admin = false )
     {
     $filename = BOOKAROOM_PATH . 'templates/public/adminNewRequestAlert.html';
     $handle = fopen( $filename, "r" );
@@ -698,7 +642,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
     }
      
 
-    public static function sendCustomerReceiptEmail($externals, $amenityList, $roomContList, $branchList, $internal = false)
+    public static function sendCustomerReceiptEmail($externals,  $roomContList, $branchList, $internal = false)
     {
         $fromName = get_option('bookaroom_alertEmailFromName');
         $fromEmail = get_option('bookaroom_alertEmailFromEmail');
@@ -713,8 +657,8 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
             $contents = html_entity_decode(get_option('bookaroom_newAlert_body'));
         }
 
-        $subject = self::replaceItems($subject, $externals, $amenityList, $roomContList, $branchList);
-        $contents = self::replaceItems($contents, $externals, $amenityList, $roomContList, $branchList);
+        $subject = self::replaceItems($subject, $externals,  $roomContList, $branchList);
+        $contents = self::replaceItems($contents, $externals,  $roomContList, $branchList);
 
         $option['bookaroom_baseIncrement'] = get_option('bookaroom_baseIncrement');
 
@@ -732,7 +676,7 @@ UNIX_TIMESTAMP( CONCAT_WS( '-', CAST( '{$dateInfo['year']}' AS CHAR ), LPAD( CAS
         return $contents;
     }
 
-    public static function replaceItems($contents, $externals, $amenityList, $roomContList, $branchList)
+    public static function replaceItems($contents, $externals,  $roomContList, $branchList)
     {
         $oldExternals = $externals;
 

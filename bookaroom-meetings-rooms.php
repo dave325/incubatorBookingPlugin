@@ -164,6 +164,7 @@ class bookaroom_settings_rooms {
 		# ***
 		$table_name = $wpdb->prefix . "bookaroom_rooms";
 
+	
 		$sql = "DELETE FROM `{$table_name}` WHERE `roomID` = '{$roomID}' LIMIT 1";
 		$wpdb->query( $sql );
 

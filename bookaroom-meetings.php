@@ -94,7 +94,6 @@ class book_a_room_meetings
 				
 			case 'changeStatus':
 				if( empty( $externals['res_id'] ) ) {
-					print_r($pendingList['id']);
 					self::showError( 'res_id', $externals['res_id'] );
 					break;
 				}

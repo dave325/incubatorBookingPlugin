@@ -200,7 +200,7 @@ if( !empty( $externals['action'] ) ) {
 			<td><?php _e( 'Event Name', 'book-a-room' ); ?></td>
 			<td><?php _e( 'Contact Name', 'book-a-room' ); ?></td>
 			<td><?php _e( 'Contact', 'book-a-room' ); ?></td>
-			<td><?php _e( 'Nonprofit?', 'book-a-room' ); ?></td>
+			<td><?php _e( 'Purpose of meeting', 'book-a-room' ); ?></td>
 			<td><?php _e( 'Status', 'book-a-room' ); ?></td>
 		</tr>
 		<?php
@@ -219,7 +219,6 @@ if( !empty( $externals['action'] ) ) {
 				$noteInformation = book_a_room_meetings::noteInformation( $val['me_contactName'], $notes )
 		?>
 		<tr>
-		<?php print_r($pendingList); ?>
 			<td><input name="res_id[]" type="checkbox" id="res_id[<?php echo $val['res_id']; ?>]" value="<?php echo $val['res_id']; ?>"/>
 			</td>
 			<td><strong><?php echo $branchList[$roomContList['id'][$val['ti_roomID']]['branchID']]['branchDesc']; ?></strong><br/><?php echo $roomContList['id'][$val['ti_roomID']]['desc']; ?>
@@ -242,23 +241,13 @@ if( !empty( $externals['action'] ) ) {
 				<p><a href="mailto:<?php echo $val['me_contactEmail']; ?>" target="_new"><?php echo $val['me_contactEmail']; ?></a><br/><?php echo book_a_room_meetings::prettyPhone( $val['me_contactPhonePrimary'] ); ?>
 				</p>
 			</td>
-			<?php
-				$nonProfit = ( empty( $val['me_nonProfit'] ) ) ? 'No' : 'Yes';
-				$roomCount = count( $roomContList['id'][$val['ti_roomID']]['rooms'] );
-				
-				if( empty( $val['me_nonProfit'] ) ) {
-					# find how many increments
-					$minutes = ( ( strtotime( $val['ti_endTime'] ) - strtotime( $val['ti_startTime'] ) ) / 60 ) / $option['bookaroom_baseIncrement'] ;
-					$roomPrice = $minutes * 0 * $roomCount;
-					$deposit = 	intval( $option['bookaroom_profitDeposit'] );
-				} else {
-					# find how many increments
-					$minutes = ( ( strtotime( $val['ti_endTime'] ) - strtotime( $val['ti_startTime'] ) ) / 60 ) / $option['bookaroom_baseIncrement'];
-					$roomPrice = $minutes * $option['bookaroom_nonProfitIncrementPrice'] * $roomCount;
-					$deposit = 	intval( $option['bookaroom_nonProfitDeposit'] );
-				}
-				?>
-			<td nowrap="nowrap"><strong><?php echo $nonProfit; ?></strong><br/><?php printf( __( 'Dep: $ %s', 'book-a-room' ), $deposit ); ?><br/><?php printf( __( 'Room: $ %s', 'book-a-room' ), $roomPrice ); ?></td>
+			<td>
+				<p> <?php if($val['me_desc'] == "Null"){
+					echo "No description";
+				 }else{
+					echo $val['me_desc'];
+				 } ?></p>
+			</td>
 			<td align="right" nowrap="nowrap">
 				<p><?php echo $val['me_status']; ?><br/>
 					<a href="?page=bookaroom_meetings&amp;action=view&amp;res_id=<?php echo $val['res_id']; ?>" target="_new"><?php _e( 'View', 'book-a-room' ); ?></a> | <a href="?page=bookaroom_meetings&amp;action=edit&amp;res_id=<?php echo $val['res_id']; ?>" target="_new"><?php _e( 'Edit', 'book-a-room' ); ?></a>

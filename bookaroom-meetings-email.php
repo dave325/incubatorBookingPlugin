@@ -76,7 +76,7 @@ class bookaroom_settings_email {
 		update_option( 'bookaroom_requestDenied_body', $externals[ 'bookaroom_requestDenied_body' ] );
 		update_option( 'bookaroom_requestReminder_body', $externals[ 'bookaroom_requestReminder_body' ] );
 		update_option( 'bookaroom_requestPayment_body', $externals[ 'bookaroom_requestPayment_body' ] );
-	//	update_option( 'bookaroom_newInternal_body', $externals[ 'bookaroom_newInternal_body' ] );
+		update_option( 'bookaroom_newInternal_body', $externals[ 'bookaroom_newInternal_body' ] );
 
 		return TRUE;
 	}

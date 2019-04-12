@@ -21,6 +21,7 @@ register_activation_hook( __FILE__, array( 'bookaroom_init', 'on_activate' ) );
 register_deactivation_hook( __FILE__, array( 'bookaroom_init', 'on_deactivate' ) );
 register_uninstall_hook( __FILE__, array( 'bookaroom_init', 'on_uninstall' ) );
 
+require(BOOKAROOM_PATH . 'rest_api.php');
 add_action( 'init', 'myStartSession', 1);
 add_action( 'wp_logout', 'myEndSession' );
 add_action( 'init', 'my_script_enqueuer' );
@@ -40,6 +41,7 @@ function my_script_enqueuer() {
 	add_shortcode( 'profile',	array( 'bookaroom_company_profile', 'showBookings' ) );
 	$width = get_option( 'bookaroom_screenWidth' );
 
+	wp_enqueue_style('boostrap-css', "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css");
 	if( !empty( $width ) || $width == 1 ) {
 		wp_enqueue_style( 'book-a-room-style', plugin_dir_url( __FILE__ ) . 'css/bookaroom_thin.css' );
 	} else {
@@ -53,12 +55,27 @@ function my_script_enqueuer() {
 		update_bookaroom_database();
 	}
 	wp_enqueue_script('jquery');
+
+	wp_enqueue_style('bootstrap-css', "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
+	wp_enqueue_script('bootstrap-js',"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js","","",false);
 	wp_enqueue_style( 'jquery_ui_css', "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" );
 	wp_enqueue_script( 'bookaroom_js', plugins_url( 'book-a-room/js/jstree/jquery.jstree.js' ), false );
 	wp_enqueue_script( 'jquery_ui', "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", 'jquery','',false );
+	wp_enqueue_script( 'angular', "https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js", '','',false );
+	wp_enqueue_script('angular-route',"https://code.angularjs.org/1.7.8/angular-route.min.js", "", "", false);
+	wp_enqueue_script( "angular-animate", "https://code.angularjs.org/1.7.8/angular-animate.min.js", "", "", false );
+	wp_enqueue_script('angular-script',plugins_url( 'book-a-room/js/angular-script.js' ), "", "", false);
+	wp_enqueue_script('angular-bootstrap', plugins_url('book-a-room/js/ui-bootstrap-tpls-2.5.0.min.js'), "","",false);
+
+	wp_localize_script('angular-script', 'localized',
+            array(
+								'partials' => plugins_url( 'book-a-room/templates/partials/' ),
+								"path" =>  get_site_url()
+                )
+    );
 	# languages
 	load_plugin_textdomain( 'book-a-room', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' ); 
-
+	
 }
 
 function update_bookaroom_database()

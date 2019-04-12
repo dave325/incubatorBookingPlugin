@@ -5,7 +5,7 @@
                         var time = new Date(date.getTime());
                         time.setMonth(date.getMonth() + 1);
                         time.setDate(0);
-                        var days =time.getDate() > date.getDate() ? time.getDate() - date.getDate() : 0;
+                        var days =time.getDate() > date.getDate() ? time.getDate() - date.getDate(): 0;
                         return days;
                 }
                 
@@ -23,7 +23,15 @@
       }
       
     });
+    
   } );
+  jQuery(document).ready(function(){
+    jQuery('#resetHours').click(function(e){
+    e.preventDefault();
+    jQuery('#topSubmit').children('div').children('span').empty();
+    document.forms[ "hoursForm" ].reset();
+});
+  });
   function checkSubmit() {
         var hourChecks = document.getElementsByName( 'hours[]' );
 
@@ -41,6 +49,8 @@
             alert( "Error!\nYou haven't selected any times to reserve." );
         }
     }
+
+
 
     function checkHours( curChecked ) {
 /* are there only two checked boxes? */
@@ -94,9 +104,21 @@
             let start = jQuery('#hours_' +[boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[0];
             let end = jQuery('#hours_' +[boxArr[boxArr.length - 1]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[1];
             jQuery('#topSubmit').children('div').children('span').text('Time: ' + start + ' - ' + end );
+        }else if (boxArr.length == 1){
+            let start = jQuery('#hours_' +[boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[0];
+            let end = jQuery('#hours_' +[boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[1];
+            jQuery('#topSubmit').children('div').children('span').text('Time: ' + start + ' - ' + end );
         }
     }
 </script>
+<?php
+# get reservations
+if(isset($_GET['timestamp'])){
+    $timestamp = $_GET['timestamp'];
+}else{
+    $timestamp = current_time('timestamp');
+}
+?>
 <div id="bookaroom_main_container">
     <div id="topRow">
         <div class="col">
@@ -161,6 +183,7 @@ if (empty($roomContList['branch'][$branchID])) {
                     <?php _e('Choose Date', 'book-a-room');?>
                 </span>
             </div>
+            <p>Select a date</p>
             <?php  if(isset($_GET['timestamp'])){ ?>
             <input type="text" id="datepicker" value="<?php echo $newDate = date("m/d/y",$_GET['timestamp']) ?>">
             <?php }else{ ?>
@@ -305,7 +328,6 @@ $count = 1;
                 if ($curStart < current_time('timestamp')) {
                     $incrementList[$i]['type'] = 'unavailable';
                 } else if ($isSameDate and $reservation_constraint < 30) {
-                    echo $i . ': ' . $reservation_constraint;
                     $incrementList[$i]['type'] = 'unavailable';
                 } else {
                     $incrementList[$i]['type'] = 'regular';
@@ -351,7 +373,8 @@ $count = 1;
                         #subtract current time from curStart. go to line 544
     
                         $admin = current_user_can('activate_plugins');
-                        if ($curStart < current_time('timestamp') || $reservation_constraint < 30 || (($startTime <= $validStart || $endTime <= $validStart) && empty($res_id) && $admin == false) || (($startTime >= $validEnd || $endTime >= $validEnd) && empty($res_id) && $admin == false)) {
+                        if ($curStart < current_time('timestamp') || (($startTime <= $validStart || $endTime <= $validStart) && empty($res_id) && $admin == false) || (($startTime >= $validEnd || $endTime >= $validEnd) && empty($res_id) && $admin == false)) {
+
                             $incrementList[$i]['type'] = 'unavailable';
                         }
                         if (empty($incrementList[$i]['type'])) {

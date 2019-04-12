@@ -42,7 +42,6 @@
 	</h2>
 </div>
 <h1><?php echo $user->display_name ?> Profile </h1>
-<pre><?php print_r($user); ?> </pre>
 <?php
 if ( empty( $final ) ) {
 	?>
