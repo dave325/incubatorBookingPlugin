@@ -1,13 +1,187 @@
-<uib-accordion close-others="oneAtATime">
-    <div uib-accordion-group class="panel-default" heading="Static Header, initially expanded" is-open="status.isFirstOpen" is-disabled="status.isFirstDisabled">
-      This content is straight in the template.
-    </div>
-    <div uib-accordion-group class="panel-default" heading="{{group.title}}" ng-repeat="group in groups">
-      {{group.content}}
-    </div>
-    <div uib-accordion-group class="panel-default" heading="Dynamic Body Content">
-      <p>The body of the uib-accordion group grows to fit the contents</p>
-      <button type="button" class="btn btn-default btn-sm" ng-click="addItem()">Add Item</button>
-      <div ng-repeat="item in items">{{item}}</div>
-    </div>
-  </uib-accordion>
+<h1 style="margin-left: 2%; margin-bottom: 2%;">Book a Room</h1>
+
+<div class="row-fluid">
+    <div class="full-border col-10-md" style="border: 1px solid; border-radius: 15px; border-color:rgb(54, 53, 53)00; padding: 2%; margin: 1%;"> 
+      <div class="row justify-content-between" style="padding-bottom: 1%;">  
+
+          <div class="accordion col-4-md" id="accordionExample" style="width: 400px;">
+            <div class="card">
+              <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <h6 style="margin: 0">Room ID</h6>
+                    </div>
+                  </button>
+                </h5>
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-3" >Room ID:</div>
+                        <div class="col-3"><a href="#">1</a></div>
+                      </div>
+                      <div class="row">
+                        <div class="col-3">Capacity:</div>
+                        <div class="col-3">20</div>
+                      </div>
+                      <div class="row">
+                        <div class="col-3">Room ID:</div>
+                        <div class="col-3"><a href="#">2</a></div>
+                      </div>
+                      <div class="row">
+                        <div class="col-3">Capacity:</div>
+                        <div class="col-3">20</div>
+                      </div>
+                      <div class="row">
+                          <div class="col-3">Room ID:</div>
+                          <div class="col-3"><a href="#">3</a></div>
+                        </div>
+                        <div class="row">
+                          <div class="col-3">Capacity:</div>
+                          <div class="col-3">20</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">Room ID:</div>
+                            <div class="col-3"><a href="#">4</a></div>
+                          </div>
+                          <div class="row">
+                            <div class="col-3">Capacity:</div>
+                            <div class="col-3">20</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-3">Room ID:</div>
+                              <div class="col-3"><a href="#">5</a></div>
+                            </div>
+                            <div class="row">
+                              <div class="col-3">Capacity:</div>
+                              <div class="col-3">20</div>
+                            </div>
+                    </div>
+                  </div>
+              </div>
+          
+              
+            </div>
+            
+            <!-- Angular Date Picker -->
+            <div class="col-4-md">
+                <md-content ng-controller="AppCtrl as ctrl" layout="column" layout-gt-sm="row"
+                layout-padding ng-cloak>
+                  <div layout="column" flex-order="1" flex-order-gt-sm="0">
+                    <md-subheader>Start Date</md-subheader>
+                    <md-calendar ng-model="ctrl.startDate"></md-calendar>
+                  </div>
+                  <div layout="column" flex-order="1" flex-order-gt-sm="1">
+                    <md-subheader>End Date</md-subheader>
+                    <md-calendar ng-model="ctrl.endDate"></md-calendar>
+                  </div>
+                  <div layout="column" flex-order="0" flex-order-gt-sm="2">
+                    <md-subheader>Dates</md-subheader>
+                    <div>
+                      <label>Start</label>
+                      <div>{{ctrl.startDate | date:shortDate}}</div>
+                    </div>
+                    <div><label>End</label>
+                      <div>{{ctrl.endDate | date:shortDate}}</div>
+                    </div>
+                  </div>
+                </md-content>
+            </div>
+
+          </div>
+
+          <table class="table table-borderless table-striped table-hover schedules justify-content-center" style="margin-top: 5%;">
+              <thead>
+                <tr>
+                  <th scope="col-2-md"> </th>
+                  <th scope="col-5-md">Time</th>
+                  <th scope="col-5-md">Availabilty</th>
+                </tr>
+              </thead>
+              <tbody class="">
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>7:00AM-8:00AM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>8:00AM-9:00AM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>9:00-10:00AM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>10:00AM-11:00AM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>11:00AM-12:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>12:00PM-1:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>1:00PM-2:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                    <td>2:00PM-3:00PM</td>
+                    <td>Availabile</td>
+                  </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>3:00PM-4:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>5:00PM-6:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>6:00PM-7:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>7:00PM-8:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>8:00PM-9:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>9:00PM-10:OOPM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>10:00PM-11:00PM</td>
+                  <td>Availabile</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
+                  <td>11:00PM-12:00AM</td>
+                  <td>Availabile</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+        </div> 
+
+  </div>

@@ -2,7 +2,7 @@ angular.module('wp', ['ngRoute', 'ui.bootstrap', 'ngAnimate'])
 .config(function($routeProvider, $locationProvider) {
     $routeProvider
     .when('/', {
-        templateUrl: localized.partials + 'showRooms.html',
+        templateUrl: localized.partials + '/showRooms.html',
         controller: 'Main'
     })
 })
