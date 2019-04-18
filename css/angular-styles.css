@@ -1,0 +1,40 @@
+navbar{
+    position: fixed; 
+    top: 0; 
+    width: 100vw; 
+    background-color:#3f3f3f;
+    color: #fff;
+}
+
+#nav-btns{
+    padding: 3%;
+}
+
+h1{
+    margin-left: 2%; 
+    margin-bottom: 2%;
+}
+
+.full-border{
+    border: 1px solid; 
+    border-radius: 
+    15px; border-color:rgb(54, 53, 53)00; 
+    padding: 2%; 
+    margin: 1%;
+}
+
+#room-and-date {
+    padding-bottom: 1%;
+}
+
+.accordion > .card:last-of-type {
+    width: 400px !important;
+}
+
+h6{
+    margin: 0;
+}
+
+#schedules {
+    margin-top: 5%;
+}

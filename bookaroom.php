@@ -59,6 +59,7 @@ function my_script_enqueuer() {
 	wp_enqueue_style('bootstrap-css', "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
 	wp_enqueue_script('bootstrap-js',"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js","","",false);
 	wp_enqueue_style( 'jquery_ui_css', "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" );
+	wp_enqueue_style('showrooms_css', 'book-a-room/css/angular-styles.css');
 	wp_enqueue_script( 'bookaroom_js', plugins_url( 'book-a-room/js/jstree/jquery.jstree.js' ), false );
 	wp_enqueue_script( 'jquery_ui', "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", 'jquery','',false );
 	wp_enqueue_script( 'angular', "https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js", '','',false );

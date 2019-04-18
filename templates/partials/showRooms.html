@@ -1,15 +1,28 @@
-<h1 style="margin-left: 2%; margin-bottom: 2%;">Book a Room</h1>
+<div class="container-fluid">
+<nav class="navbar">
+    <div class="row justify-content-center">
+      <div class="col-md-3">Room: </div>
+      <div class="col-md-3">Time: </div>
+      <div class="col-md-3">Date: </div>
+      <div class="row justify-content-between" id="nav-btns">
+          <div class="col-md-6"><button type="button" class="btn btn-primary">Submit</button></div>
+          <div class="col-md-6"><button type="button" class="btn btn-secondary">Reset</button></div>
+      </div>
+    </div>
+</nav>
+
+<h1>Book a Room</h1>
 
 <div class="row-fluid">
-    <div class="full-border col-10-md" style="border: 1px solid; border-radius: 15px; border-color:rgb(54, 53, 53)00; padding: 2%; margin: 1%;"> 
-      <div class="row justify-content-between" style="padding-bottom: 1%;">  
+    <div class="full-border col-10-md"> 
+      <div class="row justify-content-between" id="room-and-date">  
 
-          <div class="accordion col-4-md" id="accordionExample" style="width: 400px;">
+          <div class="accordion col-2-md" id="accordionExample" style="width:500px;">
             <div class="card">
               <div class="card-header" id="headingOne">
                 <h5 class="mb-0">
                   <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    <h6 style="margin: 0">Room ID</h6>
+                    <h6>Room ID</h6>
                     </div>
                   </button>
                 </h5>
@@ -63,7 +76,7 @@
             </div>
             
             <!-- Angular Date Picker -->
-            <div class="col-4-md">
+            <div class="col-2-md">
                 <md-content ng-controller="AppCtrl as ctrl" layout="column" layout-gt-sm="row"
                 layout-padding ng-cloak>
                   <div layout="column" flex-order="1" flex-order-gt-sm="0">
@@ -89,7 +102,7 @@
 
           </div>
 
-          <table class="table table-borderless table-striped table-hover schedules justify-content-center" style="margin-top: 5%;">
+          <table class="table table-borderless table-striped table-hover justify-content-center"  id="schedules">
               <thead>
                 <tr>
                   <th scope="col-2-md"> </th>
@@ -185,3 +198,4 @@
         </div> 
 
   </div>
+</div>
