@@ -1,202 +1,72 @@
-<div class="container-fluid">
 <nav class="navbar">
-    <div class="row justify-content-center">
-      <div class="col-md-3">Room: </div>
-      <div class="col-md-3">Time: </div>
-      <div class="col-md-3">Date: </div>
-      <div class="row justify-content-between" id="nav-btns">
-          <div class="col-md-6"><button type="button" class="btn btn-primary">Submit</button></div>
-          <div class="col-md-6"><button type="button" class="btn btn-secondary">Reset</button></div>
-      </div>
+  <div class="row justify-content-center">
+    <div class="col-md-3">Room:  </div>
+    <div class="col-md-3">Time: </div>
+    <div class="col-md-3">Date: </div>
+    <div class="row justify-content-between" id="nav-btns">
+      <a class="btn btn-primary" ng-click="submit()">Submit</a>
+      <div class="col-md-6"><button type="button" class="btn btn-secondary">Reset</button></div>
     </div>
+  </div>
 </nav>
 
 <h1>Book a Room</h1>
 
 <div class="row-fluid">
-    <div class="full-border col-10-md"> 
-      <div class="row justify-content-between" id="room-and-date">  
+  <div class="full-border col-md-10">
+    <div class="row justify-content-between" id="room-and-date">
 
-          <div class="accordion col-5-md" id="accordionExample" style="width:500px;">
-            <div class="card">
-              <div class="card-header" id="headingOne">
-                <h5 class="mb-0">
-                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    <h6>Room ID</h6>
-                    </div>
-                  </button>
-                </h5>
-                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="row justify-content-between">
-                        <div class="col-3" >Room ID:</div>
-                        <div class="col-3"><a href="#">1</a></div>
-                      </div>
-                      <div class="row justify-content-between">
-                        <div class="col-3">Capacity:</div>
-                        <div class="col-3">20</div>
-                      </div>
-                      <div class="row justify-content-between">
-                        <div class="col-3">Room ID:</div>
-                        <div class="col-3"><a href="#">2</a></div>
-                      </div>
-                      <div class="row justify-content-between">
-                        <div class="col-3">Capacity:</div>
-                        <div class="col-3">20</div>
-                      </div>
-                      <div class="row justify-content-between">
-                          <div class="col-3">Room ID:</div>
-                          <div class="col-3"><a href="#">3</a></div>
-                        </div>
-                        <div class="row justify-content-between">
-                          <div class="col-3">Capacity:</div>
-                          <div class="col-3">20</div>
-                        </div>
-                        <div class="row justify-content-between">
-                            <div class="col-3">Room ID:</div>
-                            <div class="col-3"><a href="#">4</a></div>
-                          </div>
-                          <div class="row justify-content-between">
-                            <div class="col-3">Capacity:</div>
-                            <div class="col-3">20</div>
-                          </div>
-                          <div class="row justify-content-between">
-                              <div class="col-3">Room ID:</div>
-                              <div class="col-3"><a href="#">5</a></div>
-                            </div>
-                            <div class="row justify-content-between">
-                              <div class="col-3">Capacity:</div>
-                              <div class="col-3">20</div>
-                            </div>
-                    </div>
-                  </div>
-              </div>
-              
-              <div class="card">
-              </div>
+
+      <div id="collapseOne" class="col-sm-12 col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading col-sm-12">
+            <div class="panel-title col-sm-12"  ng-click="isCollapsed = !isCollapsed">
+              <h4 class="col-sm-12">
+                Room List
+              </h4>
             </div>
-            
-            
-            <div class="col-2-md">
-                <md-content ng-controller="AppCtrl as ctrl" layout="column" layout-gt-sm="row"
-                layout-padding ng-cloak>
-                  <div layout="column" flex-order="1" flex-order-gt-sm="0">
-                    <md-subheader>Start Date</md-subheader>
-                    <md-calendar ng-model="ctrl.startDate"></md-calendar>
-                  </div>
-                  <div layout="column" flex-order="1" flex-order-gt-sm="1">
-                    <md-subheader>End Date</md-subheader>
-                    <md-calendar ng-model="ctrl.endDate"></md-calendar>
-                  </div>
-                  <div layout="column" flex-order="0" flex-order-gt-sm="2">
-                    <md-subheader>Dates</md-subheader>
-                    <div>
-                      <label>Start</label>
-                      <div>{{ctrl.startDate | date:shortDate}}</div>
-                    </div>
-                    <div><label>End</label>
-                      <div>{{ctrl.endDate | date:shortDate}}</div>
-                    </div>
-                  </div>
-                </md-content>
+          </div>
+          <div class="panel-body" uib-collapse="isCollapsed">
+            <div class="row justify-content-between" ng-repeat="room in rooms">
+              <div class="col-sm-12 col-md-3">Room: {{room.roomCont_desc}}</div>
+              <div class="col-sm-12 col-md-3"><a ng-click="selectRoom($index)">Occupation: {{room.roomCont_occ}}</a></div>
             </div>
-
           </div>
+        </div>
+      </div>
 
-          <table class="table table-borderless table-striped table-hover justify-content-center"  id="schedules">
-              <thead>
-                <tr>
-                  <th scope="col-2-md"> </th>
-                  <th scope="col-5-md">Time</th>
-                  <th scope="col-5-md">Availabilty</th>
-                </tr>
-              </thead>
-              <tbody class="">
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>7:00AM-8:00AM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>8:00AM-9:00AM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>9:00-10:00AM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>10:00AM-11:00AM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>11:00AM-12:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>12:00PM-1:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>1:00PM-2:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                    <td>2:00PM-3:00PM</td>
-                    <td>Availabile</td>
-                  </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>3:00PM-4:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>5:00PM-6:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>6:00PM-7:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>7:00PM-8:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>8:00PM-9:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>9:00PM-10:OOPM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>10:00PM-11:00PM</td>
-                  <td>Availabile</td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Checkbox for following text input"></td>
-                  <td>11:00PM-12:00AM</td>
-                  <td>Availabile</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-        </div> 
 
+
+      <div class="col-2-md">
+        <div style="display:inline-block; min-height:290px;">
+          <div uib-datepicker ng-model="dt" class="well well-sm" datepicker-options="options"></div>
+        </div>
+      </div>
+
+    </div>
+    <button class="btn btn-primary" ng-click="togglePast()">Show past bookings</button>
+    <table class="table table-borderless table-striped justify-content-center" id="schedules">
+      <thead>
+        <tr>
+          <th scope="col-2-md"> </th>
+          <th scope="col-5-md">Time</th>
+          <th scope="col-5-md">Availabilty</th>
+        </tr>
+      </thead>
+      <tbody class="">
+        <tr ng-repeat="time in validTimes" ng-class="[{available:!time.available && !time.reservation, 
+            hasReservation: !time.available && time.reservation, 
+            'animate-show-hide': time.past != undefined}]" ng-hide="time.past">
+          <td><input type="checkbox" aria-label="Checkbox for following text input" ng-show="time.available"
+              value="{{$index}}" name="hours[]" ng-change="check(time.place)" id="hours_{{time.place}}" ng-model="hour">
+          </td>
+          <td>{{time.start_time | date:shortTime}} - {{time.end_time | date:shortTime}}</td>
+          <td ng-if="time.available">Availabile</td>
+          <td ng-if="!time.available && time.reservation">{{reservations[time.reservation].company_name}}</td>
+          <td ng-if="!time.available && !time.reservation">Unavilable</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
+
 </div>

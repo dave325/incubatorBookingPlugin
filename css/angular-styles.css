@@ -1,3 +1,7 @@
+#dsol-book-room{
+    min-height:75vh !important;
+
+}
 .navbar{
     position: fixed; 
     top: 0; 
@@ -35,3 +39,69 @@ h6{
     margin: 0;
 }
 
+
+.available{
+    background-color:red !important;
+}
+.hasReservation{
+    background-color:green !important;
+}
+
+#angular-nav{
+    position: absolute;
+    font-family: sans-serif;
+    left: 0px;
+    top: 10px;
+    height: 200px;
+    width: 300px;
+    background-color: #F6D565;
+}
+
+#view-container.ng-enter, #view-container.ng-leave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    -webkit-transition:all .5s ease-in-out;
+      -moz-transition:all .5s ease-in-out;
+      -o-transition:all .5s ease-in-out;
+      transition:all .5s ease-in-out;
+  }
+  
+  #view-container.ng-enter {
+    opacity: 0;
+    -webkit-transform:scale3d(0.5, 0.5, 0.5);
+    -moz-transform:scale3d(0.5, 0.5, 0.5);
+    transform:scale3d(0.5, 0.5, 0.5);
+  }
+  
+  #view-container.ng-enter-active {
+    opacity: 1;
+    -webkit-transform:scale3d(1, 1, 1);
+    -moz-transform:scale3d(1, 1, 1);
+    transform:scale3d(1, 1, 1);
+  }
+  
+  #view-container.ng-leave {
+    opacity: 1;
+    /*padding-left: 0px;*/  
+    -webkit-transform:translate3d(0, 0, 0);
+    -moz-transform:translate3d(0, 0, 0);
+    transform:translate3d(0, 0, 0);
+  }
+  
+  #view-container.ng-leave-active {
+    opacity: 0;
+    /*padding-left: 100px;*/
+    -webkit-transform:translate3d(100px, 0, 0);
+    -moz-transform:translate3d(100px, 0, 0);
+    transform:translate3d(100px, 0, 0);
+  }
+
+  .animate-show-hide.ng-hide {
+    opacity: 0;
+  }
+  
+  .animate-show-hide.ng-hide-add,
+  .animate-show-hide.ng-hide-remove {
+    transition: all linear 0.5s;
+  }

@@ -15,15 +15,13 @@
                 'callback'  => array( $this, 'get_items' )
             )
         ) );
-        register_rest_route( $this->namespace, '/' . $this->resource_name . '/(?P<id>[\d]+)', array(
+        register_rest_route( $this->namespace, '/getRoomInfo', array(
             // Notice how we are registering multiple endpoints the 'schema' equates to an OPTIONS request.
             array(
-                'methods'   => 'GET',
-                'callback'  => array( $this, 'get_item' ),
-                'permission_callback' => array( $this, 'get_item_permissions_check' ),
-            ),
-            // Register our schema callback.
-            'schema' => array( $this, 'get_item_schema' ),
+                'methods'   => 'POST',
+                'callback'  => array( $this, 'getRoomInfo' )
+               
+            )
         ) );
     }
  
@@ -45,10 +43,37 @@
      * @param WP_REST_Request $request Current request.
      */
     public function get_items( WP_REST_Request $request ) {
-        $args = $request;
+        global $wpdb;
 
+        /***
+         * Rewrite By David
+         *     Sumaita
+         *     Removed part of the where clause
+         */
+        $table_nameRes = $wpdb->prefix . 'bookaroom_reservations';
+        $table_name = $wpdb->prefix . 'bookaroom_times';
+        $sql = "SELECT reservation.res_id,
+                        reservation.company_name,
+                        reservation.email,
+                        reservation.email,
+                        reservation.attendance,
+                        reservation.notes,
+                        room_container.container_number,
+                        room.room_number,
+                        branch.b_name,
+                        time_table.start_time,
+                        time_table.end_time
+        FROM branch
+        LEFT JOIN room ON branch.b_id = room.b_id
+        LEFT JOIN room_container ON room.r_id = room_container.r_id
+        LEFT JOIN reservation ON room_container.c_id = reservation.c_id
+        LEFT JOIN time_table ON time_table.t_id = reservation.t_id
+        WHERE reservation.res_id IS NOT NULL
+        GROUP BY reservation.res_id,room_container.container_number,room.room_number,branch.b_name 
+        ORDER BY time_table.start_time;";
+        $final = $wpdb->get_results($sql, ARRAY_A);
         // Return all of our comment response data.
-        return rest_ensure_response( $_POST );
+        return rest_ensure_response( $final );
     }
  
     /**
@@ -68,18 +93,21 @@
      *
      * @param WP_REST_Request $request Current request.
      */
-    public function get_item( $request ) {
-        $id = (int) $request['id'];
-        $post = get_post( $id );
- 
-        if ( empty( $post ) ) {
-            return rest_ensure_response( array() );
-        }
- 
-        $response = prepare_item_for_response( $post );
- 
-        // Return all of our post response data.
-        return $response;
+    public function getRoomInfo(WP_REST_Request $request ) {
+        
+        global $wpdb;
+
+        /***
+         * Rewrite By David
+         *     Sumaita
+         *     Removed part of the where clause
+         */
+        $table_nameRes = $wpdb->prefix . 'bookaroom_reservations';
+        $table_name = $wpdb->prefix . 'bookaroom_roomConts';
+        $sql = "SELECT * FROM " . $table_name . " WHERE roomCont_isPublic=1";
+        $final = $wpdb->get_results($sql, ARRAY_A);
+        // Return all of our comment response data.
+        return rest_ensure_response( $final );
     }
  
     /**
