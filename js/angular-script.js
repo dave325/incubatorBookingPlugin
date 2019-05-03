@@ -86,6 +86,10 @@ angular.module('wp', ['ngRoute', 'ui.bootstrap', 'ngAnimate'])
         templateUrl: localized.partials + '/submitForm.html',
         controller: 'SubmitForm'
       })
+      .when('/profile',{
+        templateUrl:  localized.partials + '/profile.html',
+        controller: 'profile'
+      })
   })
   .controller('Main', function ($scope, TIMES, $http, myFactory, $location) {
     $scope.oneAtATime = true;
@@ -94,8 +98,7 @@ angular.module('wp', ['ngRoute', 'ui.bootstrap', 'ngAnimate'])
     $scope.reservations = TIMES.reservations;
     $scope.rooms = TIMES.rooms;
     $scope.isCollapsed = false;
-    $scope.data = myFactory.getData();
-    console.log($scope.rooms);
+    $scope.data = myFactory.getData;
     $scope.togglePast = function(){
       $scope.validTimes.forEach((ele)=>{
         if(ele.past != undefined){
@@ -104,9 +107,10 @@ angular.module('wp', ['ngRoute', 'ui.bootstrap', 'ngAnimate'])
       })
     }
     $scope.selectRoom = function(idx){
-      console.log(idx);
       myFactory.setRoom($scope.rooms[idx].roomCont_ID);
+      $scope.data.room = $scope.rooms[idx].roomCont_desc;
       $scope.isCollapsed = true;
+      console.log($scope.data);
     }
     $scope.check = function (curChecked) {
       /* are there only two checked boxes? */
@@ -163,17 +167,21 @@ angular.module('wp', ['ngRoute', 'ui.bootstrap', 'ngAnimate'])
             $scope.validTimes[s].selected = true;
           }
         }
-      }/*
+      }
       // If box has more than one item in it display the time 
       if (boxArr.length > 1) {
-        let start = jQuery('#hours_' + [boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[0];
-        let end = jQuery('#hours_' + [boxArr[boxArr.length - 1]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[1];
-        jQuery('#topSubmit').children('div').children('span').text('Time: ' + start + ' - ' + end);
+       // let start = jQuery('#hours_' + [boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[0];
+       // let end = jQuery('#hours_' + [boxArr[boxArr.length - 1]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[1];
+        $scope.data.arr[0] = $scope.validTimes[boxArr[0]];
+        $scope.data.arr[1] = $scope.validTimes[boxArr[boxArr.length - 1]];
+       // jQuery('#topSubmit').children('div').children('span').text('Time: ' + start + ' - ' + end);
       } else if (boxArr.length == 1) {
-        let start = jQuery('#hours_' + [boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[0];
-        let end = jQuery('#hours_' + [boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[1];
-        jQuery('#topSubmit').children('div').children('span').text('Time: ' + start + ' - ' + end);
-      }*/
+       // let start = jQuery('#hours_' + [boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[0];
+       // let end = jQuery('#hours_' + [boxArr[0]]).parent().parent().siblings('.calTime').children().text().trim().split('-')[1];
+       // jQuery('#topSubmit').children('div').children('span').text('Time: ' + start + ' - ' + end);
+       $scope.data.arr[0] = $scope.validTimes[boxArr[0]];
+      }
+      console.log($scope.data.arr);
     }
     var getRemanningDays = function () {
       var date = new Date();
@@ -339,4 +347,36 @@ angular.module('wp', ['ngRoute', 'ui.bootstrap', 'ngAnimate'])
       window.sessionStorage.removeItem('userData')
     }
     return service;
+  }).controller('profile', function ($scope, $http, myFactory) {
+    if (myFactory.retrieveInfo()) {
+      $scope.info = {
+        numAttend: myFactory.getData.numAttend,
+        desc: myFactory.getData.desc
+      }
+    } else {
+      $scope.info = {
+        numAttend: 0,
+        desc: ''
+      };
+    }
+    $scope.submit = function () {
+      if ($scope.info.desc &&
+        $scope.info.desc.length > 0 &&
+        $scope.info.numAttend &&
+        $scope.info.numAttend > 0
+      ) {
+        myFactory.setNumAttend($scope.info.numAttend);
+        myFactory.setDesc($scope.info.desc);
+        myFactory.storeInfo();
+        console.log(myFactory.retrieveInfo());
+        $http.post(localized.path + '/wp-json/dsol-booking/v1/parse', myFactory.retrieveInfo()).then(
+          (res) => {
+            console.log(res);
+            myFactory.removeData();
+          }, (err) => {
+            console.log(err);
+          }
+        )
+      }
+    }
   });
